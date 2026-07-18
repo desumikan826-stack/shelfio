@@ -139,21 +139,30 @@ async function searchBook() {
 
     try {
 
-        const APP_ID = "pk_txpz7V5UM30meBVaFsCWQd3FbSH5zHFcB2XZ2whKdXt";
+        
+        const APPLICATION_ID = "246b99d2-5d3f-4cf5-8b60-2ac664b77f76";
+        const ACCESS_KEY = "pk_txpz7V5UM30meBVaFsCWQd3FbSH5zHFcB2XZ2whKdXt";
+
 
         console.log("APP_ID:", APP_ID);
         console.log("length:", APP_ID.length);
 
         
         
+        
         const url =
-            "https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404" +
-            "?applicationId=" + encodeURIComponent(APP_ID) +
+            "https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404" +
+            "?applicationId=" + encodeURIComponent(APPLICATION_ID) +
+            "&accessKey=" + encodeURIComponent(ACCESS_KEY) +
             "&title=" + encodeURIComponent(keyword) +
             "&format=json";
 
+
         
-        console.log("APP_ID =", APP_ID);
+        
+        console.log("APPLICATION_ID =", APPLICATION_ID);
+        console.log("ACCESS_KEY =", ACCESS_KEY);
+
         console.log("URL =", url);
 
 
