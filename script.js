@@ -141,7 +141,7 @@ async function searchBook() {
 
         
         const APPLICATION_ID = "246b99d2-5d3f-4cf5-8b60-2ac664b77f76";
-        const ACCESS_KEY = "pk_txpz7V5UM30meBVaFsCWQd3FbSH5zHFcB2XZ2whKdXt";
+        const ACCESS_KEY = "pk_Wg4VWiSclMvhhFtEZ244i6Rg6xuZWGY1X0HoxQRKe7d";
 
 
         
@@ -173,7 +173,13 @@ async function searchBook() {
 
         console.log(url);
 
-        const response = await fetch(url);
+        
+        const response = await fetch(url, {
+            headers: {
+                "accessKey": ACCESS_KEY
+            }
+        });
+
 
         
         console.log(response.status);
