@@ -1,3 +1,4 @@
+console.log("最新版script.js");
 console.log("script.js 読み込み成功");
 
 let books = [];
@@ -55,8 +56,11 @@ function addBook() {
 function displayBooks() {
 
     const list = document.getElementById("bookList");
-    const keyword = document.getElementById("search").value.toLowerCase();
+    const search = document.getElementById("search");
 
+    if (!list || !search) return;
+
+    const keyword = search.value.toLowerCase();
     list.innerHTML = "";
 
     books.forEach((book, index) => {
@@ -124,38 +128,50 @@ displayBooks();
 
 async function searchBook() {
 
-    const keyword = document.getElementById("bookSearch").value;
+    const input = document.getElementById("bookSearch");
+
+    if (!input) return;
+
+    const keyword = input.value;
 
     if (keyword === "") return;
 
     try {
 
-    const APP_ID = "あなたのアプリID";
+        const APP_ID = "1eebfe84-910f-4d7c-978b-a32996e54aa2";
 
-    const url =
-        "https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404" +
-        "?applicationId=" + APP_ID +
-        "&title=" + encodeURIComponent(keyword);
+        console.log("APP_ID:", APP_ID);
+        console.log("length:", APP_ID.length);
 
-    const response = await fetch(url);
+        const url =
+            "https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404" +
+            "?applicationId=" + APP_ID +
+            "&title=" + encodeURIComponent(keyword) +
+            "&format=json";
 
-    if (!response.ok) {
-        alert("APIエラー: " + response.status);
-        return;
+        console.log(url);
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            const error = await response.json();
+            console.log(error);
+            alert(JSON.stringify(error));
+            return;
+        }
+
+        const data = await response.json();
+
+        console.log(data);
+
+        alert("検索件数: " + data.Items.length);
+
+        displaySearchResult(data.Items);
+
+    } catch (e) {
+        console.error(e);
+        alert("エラー: " + e.message);
     }
-
-    const data = await response.json();
-
-    console.log(data);
-
-    alert("検索件数: " + data.Items.length);
-
-    displaySearchResult(data.Items);
-
-} catch (e) {
-    console.error(e);
-    alert("エラー: " + e.message);
-}
 }
 
 function displaySearchResult(items) {
@@ -163,58 +179,28 @@ function displaySearchResult(items) {
     const result = document.getElementById("searchResult");
     result.innerHTML = "";
 
-    items.forEach((book) => {
+    items.forEach((item) => {
 
-        function displaySearchResult(items) {
-
-            const result = document.getElementById("searchResult");
-            result.innerHTML = "";
-
-            items.forEach((item) => {
-
-            const info = item.Item;
-
-            const div = document.createElement("div");
-            div.className = "book";
-
-            div.innerHTML = `
-                <img src="${info.largeImageUrl || ""}">
-                <h3>${info.title}</h3>
-                <p>著者：${info.author}</p>
-                <p>発売日：${info.salesDate}</p>
-                <p>価格：${info.itemPrice}円</p>
-            `;
-
-            const button = document.createElement("button");
-            button.textContent = "登録";
-
-            button.onclick = () => addRakutenBook(info);
-
-            div.appendChild(button);
-
-            result.appendChild(div);
-    });
-}
+        const info = item.Item;
 
         const div = document.createElement("div");
         div.className = "book";
 
         div.innerHTML = `
-            <img src="${info.imageLinks?.thumbnail || ""}">
+            <img src="${info.largeImageUrl || ""}">
             <h3>${info.title}</h3>
-            <p>${info.authors ? info.authors.join(", ") : "著者不明"}</p>
+            <p>著者：${info.author}</p>
+            <p>発売日：${info.salesDate}</p>
+            <p>価格：${info.itemPrice}円</p>
         `;
 
         const button = document.createElement("button");
         button.textContent = "登録";
-
         button.onclick = () => addRakutenBook(info);
 
         div.appendChild(button);
-
         result.appendChild(div);
     });
-
 }
 
 function addRakutenBook(info) {
