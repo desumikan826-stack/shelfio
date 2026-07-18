@@ -1,0 +1,53 @@
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    
+    <meta charset="UTF-8">
+    <title>欲しい本リスト</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h2>Google Books検索</h2>
+
+<input
+    type="text"
+    id="bookSearch"
+    placeholder="本のタイトルを入力">
+
+<button type="button" onclick="searchBook()">
+    検索
+</button>
+
+<div id="searchResult"></div>
+
+<div class="form">
+    <input id="title" placeholder="本のタイトル">
+    <input id="author" placeholder="著者">
+
+<div id="rating" class="rating">
+    <span onclick="setRating(1)">☆</span>
+    <span onclick="setRating(2)">☆</span>
+    <span onclick="setRating(3)">☆</span>
+    <span onclick="setRating(4)">☆</span>
+    <span onclick="setRating(5)">☆</span>
+    <label>
+    <input type="checkbox" id="purchased">
+    購入済み
+</label>
+
+<label>
+    <input type="checkbox" id="read">
+    読了済み
+</label>
+</div>
+
+<button onclick="addBook()">登録</button>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
