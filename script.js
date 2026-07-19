@@ -161,15 +161,10 @@ async function searchBook() {
             "&title=" + encodeURIComponent(keyword) +
             "&format=json";
 
-
-        
-        
         console.log("APPLICATION_ID =", APPLICATION_ID);
         console.log("ACCESS_KEY =", ACCESS_KEY);
 
         console.log("URL =", url);
-
-
 
         console.log(url);
 
@@ -180,11 +175,7 @@ async function searchBook() {
             }
         });
 
-
-        
         console.log(response.status);
-
-
         
         const data = await response.json();
 
@@ -195,8 +186,6 @@ async function searchBook() {
         }
 
         console.log(data);
-
-
 
         alert("検索件数: " + data.Items.length);
 
