@@ -1,0 +1,41 @@
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    
+    <meta charset="UTF-8">
+    <title>欲しい本リスト</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="search">
+    <input
+        type="text"
+        id="search"
+        placeholder="本を検索..."
+        onkeyup="displayBooks()">
+</div>
+
+<div id="bookList"></div>
+
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeSettings()">&times;</span>
+
+        <h2>⚙️ 設定</h2>
+
+        <p>ここに設定項目を追加できます。</p>
+
+        <label>
+            <input type="checkbox">
+            ダークモード
+        </label>
+    </div>
+</div>
+<script src="script.js"></script>
+
+
+
+</body>
+</html>

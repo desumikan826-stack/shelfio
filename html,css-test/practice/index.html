@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML-practice</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+
+
+
+
+
+
+    <link rel="stylesheet" href="./CSS-pra.css">
+    <link rel="stylesheet" href="./sanitize.css">
+
+    <link rel="icon" type="image/png" href="./image/favicon/" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="./image/favicon/favicon.ico" />
+    <link rel="shortcut icon" href="./image/favicon/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="./image/favicon/favicon.ico" />
+    <link rel="manifest" href="./image/favicon/favicon.ico" />
+</head>
+
+<body>
+
+    <div class="hero">
+        <strong>Hello World!</strong>
+        <div class="hero-particles" id="particles-js"></div>
+        <video autoplay loop muted preload><!-- autoplay属性は勝手に流す、loop属性はループさせる、muted属性は無音にする、preload属性はHTMLが読み込まれたら即座にMP4の読み込みを開始する -->
+            <source src="./image/hero.mp4" type="video/mp4">
+            <!-- 
+            <source src="./image/hero.mp4" type="video/mp4">
+            <source src="./image/hero.mp4" type="video/mp4"> 
+            -->
+        </video><!-- もし一番上が読み込まれない場合、下の動画を読み込む。したがってsourceタグを使うほうがいい -->
+    </div>
+
+    <header class="header">
+        <h1 class="header-logo">
+            <a href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0.002 637.793 637.798">
+                    <g>
+                        <path fill="#f90" d="M0 .007h637.793V637.8H0z"/>
+                        <path fill="#de8500" d="M318.887 318.908h318.906v317.92H318.887z"/><path fill="#ffb13b" d="M.005.002H318.91v318.906H.005z"/><g fill="#f90" transform="translate(-1474.901 -846.129) scale(4.67501)"><circle cx="340.757" cy="249.099" r="25.063"/><circle cx="353.365" cy="218.661" r="25.063"/><circle cx="383.803" cy="206.053" r="25.063"/><circle cx="414.241" cy="218.661" r="25.063"/><circle cx="426.849" cy="249.099" r="25.063"/><circle cx="414.241" cy="279.538" r="25.063"/><circle cx="383.803" cy="292.146" r="25.063"/><circle cx="353.365" cy="279.538" r="25.063"/></g><path d="M402.742 117.161c0-46.02-37.335-83.36-83.36-83.36s-83.36 37.335-83.36 83.36c-32.557-32.533-85.338-32.533-117.895 0-32.533 32.557-32.533 85.338 0 117.895-46.02 0-83.36 37.335-83.36 83.36 0 46.02 37.335 83.36 83.36 83.36-32.533 32.557-32.533 85.338 0 117.894 32.557 32.534 85.338 32.534 117.895 0 0 46.021 37.334 83.36 83.36 83.36s83.36-37.334 83.36-83.36c32.557 32.534 85.333 32.534 117.894 0 32.534-32.556 32.534-85.337 0-117.894 46.021 0 83.332-37.335 83.332-83.36 0-46.02-37.31-83.36-83.332-83.36 32.534-32.557 32.534-85.338 0-117.895-32.561-32.533-85.337-32.533-117.894 0z"/><path d="M351.28 149.082v92.304l65.277-65.277c0-11.534 4.403-23.095 13.207-31.898 17.634-17.63 46.212-17.63 63.818 0 17.63 17.606 17.63 46.19 0 63.819-8.803 8.803-20.364 13.207-31.898 13.207l-65.277 65.277h92.304c8.167-8.168 19.443-13.23 31.92-13.23 24.91 0 45.105 20.219 45.105 45.127 0 24.909-20.196 45.128-45.104 45.128-12.478 0-23.754-5.058-31.921-13.23h-92.304l65.277 65.277c11.534 0 23.095 4.404 31.898 13.207 17.63 17.634 17.63 46.212 0 63.819-17.606 17.634-46.184 17.634-63.818 0-8.804-8.804-13.207-20.365-13.207-31.898l-65.278-65.277v92.303c8.168 8.167 13.23 19.444 13.23 31.921 0 24.909-20.223 45.105-45.127 45.105-24.909 0-45.128-20.196-45.128-45.105 0-12.477 5.058-23.754 13.23-31.92v-92.304l-65.277 65.277c0 11.533-4.404 23.094-13.207 31.898-17.634 17.634-46.212 17.634-63.818 0-17.634-17.611-17.634-46.19 0-63.819 8.803-8.803 20.364-13.207 31.897-13.207l65.277-65.277h-92.303c-8.167 8.167-19.443 13.23-31.921 13.23-24.908 0-45.104-20.22-45.104-45.128s20.196-45.128 45.104-45.128c12.478 0 23.754 5.063 31.921 13.23h92.303l-65.277-65.276c-11.533 0-23.094-4.4-31.897-13.207-17.634-17.634-17.634-46.213 0-63.819 17.61-17.63 46.184-17.63 63.818 0 8.803 8.803 13.207 20.364 13.207 31.898l65.277 65.277v-92.304c-8.167-8.167-13.23-19.443-13.23-31.92 0-24.909 20.22-45.105 45.128-45.105 24.904 0 45.128 20.196 45.128 45.104 0 12.478-5.063 23.754-13.23 31.921z" fill="#fff"/><path d="M34.795 318.898H603.94v284.1H34.795z"/><path d="M34.795 478.325H603.94v124.678H34.795z"/><path d="M94.448 345.25H548.93c18.62 0 33.828 15.208 33.828 33.829v114.103c-175.636-21.73-349.77-51.766-522.138-48.99V379.08c0-18.62 15.203-33.828 33.828-33.828z" fill="#3f3f3f"/><path fill="#fff" stroke="#000" stroke-width="2.352" d="M393.205 337.574l-52.542 253.774h-43.548l-52.57-253.774h43.552l30.79 148.637 30.77-148.637zm74.342 105.113h74.342v74.319c0 41.056-33.286 74.342-74.319 74.342-41.056 0-74.342-33.286-74.342-74.342V411.897h-.023c0-41.032 33.286-74.318 74.342-74.318s74.342 33.286 74.342 74.318h-43.552c0-16.998-13.796-30.766-30.79-30.766-16.998 0-30.766 13.773-30.766 30.766v105.109c0 16.998 13.772 30.79 30.766 30.79s30.79-13.797 30.79-30.767v-30.79h-30.79v-43.552zM117.66 464.459c-13.44-13.464-21.776-32.038-21.776-52.566 0-41.056 33.286-74.319 74.342-74.319 41.032 0 74.318 33.263 74.318 74.319h-43.529c0-16.994-13.796-30.79-30.79-30.79-16.998 0-30.789 13.796-30.789 30.79 0 8.499 3.436 16.17 8.995 21.753h.023a30.693 30.693 0 0 0 21.776 9.013v.023c20.528 0 39.102 8.313 52.543 21.777 13.464 13.44 21.776 32.037 21.776 52.542 0 41.056-33.286 74.342-74.319 74.342-41.056 0-74.342-33.286-74.342-74.342h43.548c0 17.022 13.796 30.79 30.79 30.79 16.998 0 30.79-13.773 30.79-30.79 0-8.476-3.437-16.17-9.014-21.753-5.577-5.554-13.277-9.018-21.776-9.018-20.528.005-39.102-8.33-52.566-21.771z"/>
+                    </g>
+                    <title>Bugfix Inc.</title>
+                </svg>
+            </a>
+        </h1>
+        <nav class="header-nav">
+            <ul class="header-navlist">
+                <li class="header-navitem">
+                    <a href="#">About</a>
+                </li>
+                <li class="header-navitem">
+                    <a href="#">Feature</a>
+                </li>
+                <li class="header-navitem">
+                    <a href="#">Blog</a>
+                </li>
+                <li class="header-navitem">
+                    <a href="#">Contact</a>
+                </li>
+            </ul>
+        </nav><!-- navタグは主要なナビゲーションを囲むタグ -->
+    </header><!-- ヘッダーを作るためだけのタグ -->
+
+    <h1 class="section-headline">About</h1>
+    <section class="section">
+        <h1 class="section-headline">About</h1> <!-- sectionタグにh1タグを入れるとh2になる -->
+        <figure class="about"><!-- figuraタグは画像とそれを説明するタグ -->
+            <img class="abput-image" src="https://dummyimage.com/600x400/000/fff" alt="about image"><!-- src属性には画像、alt属性には、もしsrcで画像が表示されなかった場合の画像を入れる -->
+            <figcaption class="about-caption"><!-- figcaptionタグは図・画像の説明のテキストを入れておくタグ -->
+                <h2 class="about-headline">What can we do?</h2>
+                <p class="about-description">
+                    We use CSS and HTML. <br>
+                    This is very fun. <br>
+                    text text text text text text text text text text text <br>
+                    text text text text text text text text text text text <br>
+                    text text <br>
+                </p>
+            </figcaption>
+        </figure>
+    </section>
+
+    <section class="section section-secoundary">
+        <h1 class="section-headline">Feature</h1>
+
+        <ul class="grid grid-col-4">
+            <li class="grid-item">
+                <dl class="feature">
+                    <dt class="feature-headline">1. Great Service</dt>
+                    <dd class="feature-image">
+                        <img src="./image/001-settings.png" width="100" height="100" alt="Great Service"><!-- imgタグは画像の横幅と高さを設定することができる -->
+                    </dd>
+                    <dd class="feature-discription">Text text text text text text text text text text text text text text text text text text...</dd>
+
+                </dl><!-- データの見出しとコンテンツを紐づける -->
+            </li>
+            <li class="grid-item">
+                <dl class="feature">
+                    <dt class="feature-headline">2. High Performance</dt>
+                    <dd class="feature-image">
+                        <img src="./image/002-jigsaw.png" width="100" height="100" alt="High Performance">
+                    </dd>
+                    <dd class="feature-discription">Text text text text text text text text text text text text text text text text text text...</dd>
+
+                </dl><!-- データの見出しとコンテンツを紐づける -->
+            </li>
+            <li class="grid-item">
+                <dl class="feature">
+                    <dt class="feature-headline">3. Strong Responsibility</dt>
+                    <dd class="feature-image">
+                        <img src="./image/003-layout.png" width="100" height="100" alt="Strong Responsibility">
+                    </dd>
+                    <dd class="feature-discription">Text text text text text text text text text text text text text text text text text text...</dd>
+
+                </dl><!-- データの見出しとコンテンツを紐づける -->
+            </li>
+            <li class="grid-item">
+                <dl class="feature">
+                    <dt class="feature-headline">4. Excekkebt Technology</dt>
+                    <dd class="feature-image">
+                        <img src="./image/004-product.png" width="100" height="100" alt="Excekkebt Technology">
+                    </dd>
+                    <dd class="feature-discription">Text text text text text text text text text text text text text text text text text text...</dd>
+
+                </dl><!-- データの見出しとコンテンツを紐づける -->
+            </li>
+        </ul>
+    </section>
+
+    <section class="section">
+        <h1 class="section-headline">Blog</h1>
+
+        <ul class="grid grid-col-3">
+            <li class="grid-item">
+                <article class="card"><!-- articleタグは一固まりコンテンツを作るときに使う -->
+                    <a href="#" class="card-link"><!-- 適当なリンクをつけておくときには#を使う -->
+                        <span class="card-label">New</span>
+                        <img class="card-image" src="https://dummyimage.com/200x100/000/fff" alt="thumbnail">
+                        <div class="card-info">
+                            <time datetime="2022-01-01" class="card-time">2022.01.01</time>
+                            <h1 class="card-headline">Title text text</h1>
+                            <p class="card-discription">
+                                text text text text text text text text text text text text text text text text text text text text
+                                text text text text text text text text text text text text text text text text text text text text
+                            </p>
+                        </div>
+
+                        <dl class="avator">
+                            <dt class="avator-name">Seito</dt>
+                            <dd class="avator-image"><!-- データのタイトルはテキストで当て最初に来るべきだからdtはddよりも先じゃないとだめ -->
+                                <img src="https://dummyimage.com/50x50/000/fff" alt="Author">
+                            </dd>
+                        </dl>
+                    </a>
+                </article>
+            </li>
+            <li class="grid-item">
+                <article class="card"><!-- articleタグは一固まりコンテンツを作るときに使う -->
+                    <a href="#" class="card-link"><!-- 適当なリンクをつけておくときには#を使う -->
+                        <span class="card-label">New</span>
+                        <img class="card-image" src="https://dummyimage.com/200x100/000/fff" alt="thumbnail">
+                        <div class="card-info">
+                            <time datetime="2022-01-01" class="card-time">2022.01.01</time>
+                            <h1 class="card-headline">Title text text</h1>
+                            <p class="card-discription">
+                                text text text text text text text text text text text text text text text text text text text text
+                                text text text text text text text text text text text text text text text text text text text text
+                            </p>
+                        </div>
+
+                        <dl class="avator">
+                            <dt class="avator-name">Seito</dt>
+                            <dd class="avator-image"><!-- データのタイトルはテキストで当て最初に来るべきだからdtはddよりも先じゃないとだめ -->
+                                <img src="https://dummyimage.com/50x50/000/fff" alt="Author">
+                            </dd>
+                        </dl>
+                    </a>
+                </article>
+            </li>
+            <li class="grid-item">
+                <article class="card"><!-- articleタグは一固まりコンテンツを作るときに使う -->
+                    <a href="#" class="card-link"><!-- 適当なリンクをつけておくときには#を使う -->
+                        <span class="card-label">New</span>
+                        <img class="card-image" src="https://dummyimage.com/200x100/000/fff" alt="thumbnail">
+                        <div class="card-info">
+                            <time datetime="2022-01-01" class="card-time">2022.01.01</time>
+                            <h1 class="card-headline">Title text text</h1>
+                            <p class="card-discription">
+                                text text text text text text text text text text text text text text text text text text text text
+                                text text text text text text text text text text text text text text text text text text text text
+                            </p>
+                        </div>
+
+                        <dl class="avator">
+                            <dt class="avator-name">Seito</dt>
+                            <dd class="avator-image"><!-- データのタイトルはテキストで当て最初に来るべきだからdtはddよりも先じゃないとだめ -->
+                                <img src="https://dummyimage.com/50x50/000/fff" alt="Author">
+                            </dd>
+                        </dl>
+                    </a>
+                </article>
+            </li>
+        </ul>
+
+        <div class="section-button">
+            <a href="#" class="button">
+                Blog Page
+            </a>
+        </div>
+    </section>
+
+    <section class="section section-secoundary">
+        <h1 class="section-headline">Contact</h1>
+
+        <form class="form" action=""><!-- 入力されたデータをまとめて送信する。action属性はどこへ送るか -->
+            <table class="form-table"><!-- tableタグはtrタグといっしょに使うタグ -->
+                <!-- 
+                <thead></thead>
+                <tbody></tbody>　使い方はあんまわかってない
+                <tfoot></tfoot> 
+                -->
+                <tr><!-- 行を作る -->
+                    <th>
+                        <label for="menu">
+                            Menu
+                        </label>
+                    </th><!-- 見出し -->
+                    <td>
+                        <select class="select" name="" id="menu"><!-- name属性とid属性については今はよくわかっていない -->
+                            <option value="menu-1">Menu 1</option><!-- 表示はMenu 1だがvalue属性で設定した値がバックエンド側に行く -->
+                            <option value="menu-2">Menu 2</option>
+                            <option value="menu-3">Menu 3</option>
+                        </select><!-- selectタグはプルダウンメニューが出る -->
+                    </td><!-- 項目 -->
+                </tr>
+                <tr>
+                    <th>
+                        <label for="name"><!-- labelタグは自動的にfor属性につけたidと同じ場所に自動的にフォーカスが当たる -->
+                            Name
+                        </label>
+                    </th>
+                    <td>
+                        <input class="input" type="text" id="name"><!-- type属性で="password"と入力すると打った文字が見えなくなる。"email"と入力するとスマホでは勝手に半角英数字をキーボードになる。 -->
+                    </td>
+                </tr>
+                </tr>
+                <tr>
+                    <th>
+                        <label for="email"><!-- labelタグは自動的にfor属性につけたidと同じ場所に自動的にフォーカスが当たる -->
+                            Email
+                        </label>
+                    </th>
+                    <td>
+                        <input class="input" type="email" id="email"><!-- type属性で="password"と入力すると打った文字が見えなくなる。"email"と入力するとスマホでは勝手に半角英数字をキーボードになる。 -->
+                    </td>
+                </tr>
+                </tr>
+                <tr>
+                    <th>
+                        Gender
+                    </th>
+                    <td>
+                        <label class="radio">
+                        <input type="radio" name="gender" value="male">Male
+                        </label>
+                        <label class="radio">
+                        <input type="radio" name="gender" value="femail">Femail
+                        </label>
+                        <label class="radio">
+                        <input type="radio" name="gender" value="other">Other
+                        </label>
+                        <!-- radioは単一選択、checkboxは複数選択 -->
+                        <!-- name属性をつけるとグループになる。 -->
+                    </td>
+                </tr>
+                </tr><tr>
+                    <th>
+                        <label for="detail">
+                            Detail
+                        </label>
+                    </th>
+                    <td>
+                        <textarea class="textarea" name="" id="detail" cols="30" rows="10"></textarea><!-- colsは一列に何文字入力できるか、rowsは何行入力できるか。 -->
+                    </td>
+                </tr>
+                </tr>
+                <tr>
+                    <th></th>
+                    <td></td>
+                </tr>
+            </table>
+            <div class="form-button">
+                <button class="button button-submission" type="submit">
+                    Submit
+                </button><!-- buttonタグは押すことで何かしらのアクションを起こす。 -->
+                <!-- formタグを使ってボタンを押したら送信される場合にはtype="submit"を使うことが多い -->
+                <!-- jsのアニメーションを使う場合とかは、type="button"をを使う -->
+            </div>
+            
+        </form>
+    </section>
+
+    <aside class="works">
+        <img src="https://dummyimage.com/150x80/ccc/fff" alt="logo">
+        <img src="https://dummyimage.com/150x80/ccc/fff" alt="logo">
+        <img src="https://dummyimage.com/150x80/ccc/fff" alt="logo">
+        <img src="https://dummyimage.com/150x80/ccc/fff" alt="logo">
+        <img src="https://dummyimage.com/150x80/ccc/fff" alt="logo">
+    </aside><!-- asideタグはメインコンテンツの補間をするために使うタグ -->
+
+    <footer class="footer">
+        <figure class="footer-map">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3198.8687669113333!2d137.21016461166283!3d36.701691322159725!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5ff7909c5b203e79%3A0xfd2e8dbcd4fdb276!2z5a-M5bGx6aeF!5e0!3m2!1sja!2sjp!4v1779203277935!5m2!1sja!2sjp" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <!-- iframeタグは外部のweb情報を埋め込む -->
+            <figcaption class="footer-mapinfo">
+                <div class="footer-maplogo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0.002 637.793 637.798"><path fill="#f90" d="M0 .007h637.793V637.8H0z"/><path fill="#de8500" d="M318.887 318.908h318.906v317.92H318.887z"/><path fill="#ffb13b" d="M.005.002H318.91v318.906H.005z"/><g fill="#f90" transform="translate(-1474.901 -846.129) scale(4.67501)"><circle cx="340.757" cy="249.099" r="25.063"/><circle cx="353.365" cy="218.661" r="25.063"/><circle cx="383.803" cy="206.053" r="25.063"/><circle cx="414.241" cy="218.661" r="25.063"/><circle cx="426.849" cy="249.099" r="25.063"/><circle cx="414.241" cy="279.538" r="25.063"/><circle cx="383.803" cy="292.146" r="25.063"/><circle cx="353.365" cy="279.538" r="25.063"/></g><path d="M402.742 117.161c0-46.02-37.335-83.36-83.36-83.36s-83.36 37.335-83.36 83.36c-32.557-32.533-85.338-32.533-117.895 0-32.533 32.557-32.533 85.338 0 117.895-46.02 0-83.36 37.335-83.36 83.36 0 46.02 37.335 83.36 83.36 83.36-32.533 32.557-32.533 85.338 0 117.894 32.557 32.534 85.338 32.534 117.895 0 0 46.021 37.334 83.36 83.36 83.36s83.36-37.334 83.36-83.36c32.557 32.534 85.333 32.534 117.894 0 32.534-32.556 32.534-85.337 0-117.894 46.021 0 83.332-37.335 83.332-83.36 0-46.02-37.31-83.36-83.332-83.36 32.534-32.557 32.534-85.338 0-117.895-32.561-32.533-85.337-32.533-117.894 0z"/><path d="M351.28 149.082v92.304l65.277-65.277c0-11.534 4.403-23.095 13.207-31.898 17.634-17.63 46.212-17.63 63.818 0 17.63 17.606 17.63 46.19 0 63.819-8.803 8.803-20.364 13.207-31.898 13.207l-65.277 65.277h92.304c8.167-8.168 19.443-13.23 31.92-13.23 24.91 0 45.105 20.219 45.105 45.127 0 24.909-20.196 45.128-45.104 45.128-12.478 0-23.754-5.058-31.921-13.23h-92.304l65.277 65.277c11.534 0 23.095 4.404 31.898 13.207 17.63 17.634 17.63 46.212 0 63.819-17.606 17.634-46.184 17.634-63.818 0-8.804-8.804-13.207-20.365-13.207-31.898l-65.278-65.277v92.303c8.168 8.167 13.23 19.444 13.23 31.921 0 24.909-20.223 45.105-45.127 45.105-24.909 0-45.128-20.196-45.128-45.105 0-12.477 5.058-23.754 13.23-31.92v-92.304l-65.277 65.277c0 11.533-4.404 23.094-13.207 31.898-17.634 17.634-46.212 17.634-63.818 0-17.634-17.611-17.634-46.19 0-63.819 8.803-8.803 20.364-13.207 31.897-13.207l65.277-65.277h-92.303c-8.167 8.167-19.443 13.23-31.921 13.23-24.908 0-45.104-20.22-45.104-45.128s20.196-45.128 45.104-45.128c12.478 0 23.754 5.063 31.921 13.23h92.303l-65.277-65.276c-11.533 0-23.094-4.4-31.897-13.207-17.634-17.634-17.634-46.213 0-63.819 17.61-17.63 46.184-17.63 63.818 0 8.803 8.803 13.207 20.364 13.207 31.898l65.277 65.277v-92.304c-8.167-8.167-13.23-19.443-13.23-31.92 0-24.909 20.22-45.105 45.128-45.105 24.904 0 45.128 20.196 45.128 45.104 0 12.478-5.063 23.754-13.23 31.921z" fill="#fff"/><path d="M34.795 318.898H603.94v284.1H34.795z"/><path d="M34.795 478.325H603.94v124.678H34.795z"/><path d="M94.448 345.25H548.93c18.62 0 33.828 15.208 33.828 33.829v114.103c-175.636-21.73-349.77-51.766-522.138-48.99V379.08c0-18.62 15.203-33.828 33.828-33.828z" fill="#3f3f3f"/><path fill="#fff" stroke="#000" stroke-width="2.352" d="M393.205 337.574l-52.542 253.774h-43.548l-52.57-253.774h43.552l30.79 148.637 30.77-148.637zm74.342 105.113h74.342v74.319c0 41.056-33.286 74.342-74.319 74.342-41.056 0-74.342-33.286-74.342-74.342V411.897h-.023c0-41.032 33.286-74.318 74.342-74.318s74.342 33.286 74.342 74.318h-43.552c0-16.998-13.796-30.766-30.79-30.766-16.998 0-30.766 13.773-30.766 30.766v105.109c0 16.998 13.772 30.79 30.766 30.79s30.79-13.797 30.79-30.767v-30.79h-30.79v-43.552zM117.66 464.459c-13.44-13.464-21.776-32.038-21.776-52.566 0-41.056 33.286-74.319 74.342-74.319 41.032 0 74.318 33.263 74.318 74.319h-43.529c0-16.994-13.796-30.79-30.79-30.79-16.998 0-30.789 13.796-30.789 30.79 0 8.499 3.436 16.17 8.995 21.753h.023a30.693 30.693 0 0 0 21.776 9.013v.023c20.528 0 39.102 8.313 52.543 21.777 13.464 13.44 21.776 32.037 21.776 52.542 0 41.056-33.286 74.342-74.319 74.342-41.056 0-74.342-33.286-74.342-74.342h43.548c0 17.022 13.796 30.79 30.79 30.79 16.998 0 30.79-13.773 30.79-30.79 0-8.476-3.437-16.17-9.014-21.753-5.577-5.554-13.277-9.018-21.776-9.018-20.528.005-39.102-8.33-52.566-21.771z"/></svg>
+                    Bugfix Inc.
+                </div>
+                <address class="footer-mapaddress">
+                    〒930-0001 富山県富山市明輪町1-225 <br>
+                    <a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3198.8687669113333!2d137.21016461166283!3d36.701691322159725!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5ff7909c5b203e79%3A0xfd2e8dbcd4fdb276!2z5a-M5bGx6aeF!5e0!3m2!1sja!2sjp!4v1779210144831!5m2!1sja!2sjp" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" target="_blank">Google Map</a>
+                </address><!-- addressタグは住所を囲うためだけのタグ -->
+                
+            </figcaption>
+        </figure>
+        <hr class="footer-line"><!-- hrタグはラインを作ることができるタグ -->
+        <small class="footer-copy">Copyright ©BugFix Inc.</small><!-- smallタグはコピーライトを作るためだけのタグ -->
+
+
+    </footer><!-- フッターを作るためだけのタグ -->
+    <script src="./particles.js"></script>
+    <script src="./app.js"></script>
+    
+</body>
+</html>
