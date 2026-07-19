@@ -7,6 +7,7 @@ if (!window.globalSupabase) {
 const supabase = window.globalSupabase;
 
 let books = [];
+let currentTab = 'all'; // 💡 今どのタブが選ばれているかを保存（all, want, read）
 
 console.log("最新版script.js 読み込み成功");
 
@@ -79,10 +80,22 @@ function displayBooks() {
     list.innerHTML = "";
 
     books.forEach((book, index) => {
-        if (
-            book.title.toLowerCase().includes(keyword) ||
-            book.author.toLowerCase().includes(keyword)
-        ) {
+        // 💡 1. まずキーワード検索にヒットするかチェック
+        const matchesKeyword = book.title.toLowerCase().includes(keyword) || 
+                             book.author.toLowerCase().includes(keyword);
+
+        // 💡 2. 次に、現在のタブの条件に一致するかチェック
+        let matchesTab = false;
+        if (currentTab === 'all') {
+            matchesTab = true; // 「すべて」なら無条件でOK
+        } else if (currentTab === 'want') {
+            matchesTab = !book.read; // 「欲しい本」なら、readがfalse（未読）のものだけ
+        } else if (currentTab === 'read') {
+            matchesTab = book.read; // 「読んだ本」なら、readがtrue（読了）のものだけ
+        }
+
+        // 💡 両方の条件をクリアした本だけを表示する
+        if (matchesKeyword && matchesTab) {
             list.innerHTML += `
             <div class="book">
                 <img src="${book.image || ""}" alt="表紙" class="book-image">
@@ -237,6 +250,24 @@ async function testConnection(){
     const { data, error } = await supabase.from("books").select("*");
     console.log(data);
 }
+
+
+function switchTab(tabName) {
+    currentTab = tabName; // タブの状態を更新
+
+    // すべてのボタンから active クラスを一度消す
+    document.getElementById("tab-all")?.classList.remove("active");
+    document.getElementById("tab-want")?.classList.remove("active");
+    document.getElementById("tab-read")?.classList.remove("active");
+
+    // クリックされたボタンだけに active クラスをつける
+    document.getElementById(`tab-${tabName}`)?.classList.add("active");
+
+    // 画面を再表示してフィルターをかける
+    displayBooks();
+}
+
+window.switchTab = switchTab; // HTMLから呼べるように公開
 
 const searchBtn = document.getElementById("searchBtn");
 if (searchBtn) searchBtn.addEventListener("click", searchBook);

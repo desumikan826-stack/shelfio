@@ -169,3 +169,29 @@ nav a:hover{
     font-size:28px;
     cursor:pointer;
 }
+
+/* style.css の一番下などに追加 */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+/* 今選ばれているボタンの見た目 */
+.tab-btn.active {
+    background-color: #0070f3;
+    color: white;
+    border-color: #0070f3;
+    font-weight: bold;
+}
