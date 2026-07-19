@@ -77,6 +77,7 @@ function displayBooks() {
 
                 <p>
                     評価：
+                    ${book.rating === 0 ? "<span style='color:gray;'>評価なし</span>" : ""}
                     ${[1,2,3,4,5].map(star => `
                         <span
                         onclick="changeRating(${index}, ${star})"
@@ -108,9 +109,13 @@ function displayBooks() {
 }
 
 function changeRating(index, rating) {
-    console.log("changeRating", index, rating);
 
-    books[index].rating = rating;
+    if (books[index].rating === rating) {
+        books[index].rating = 0;
+    } else {
+        books[index].rating = rating;
+    }
+
     saveBooks();
     displayBooks();
 }
