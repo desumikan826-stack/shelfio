@@ -246,6 +246,7 @@ function addRakutenBook(info) {
 
         title: info.title,
         author: info.author,
+        image: info.largeImageUrl,
         rating: 0,
         purchased: false,
         read: false
