@@ -243,16 +243,20 @@ function displaySearchResult(items) {
 function addRakutenBook(info) {
 
     console.log("登録ボタン押された");
-    alert("登録ボタン押された");
+    console.log(info);
 
     books.push({
+
         title: info.title,
         author: info.author,
         image: info.largeImageUrl,
         rating: 0,
         purchased: false,
         read: false
+
     });
+
+    console.log(books);
 
     saveBooks();
     displayBooks();
