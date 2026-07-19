@@ -94,48 +94,9 @@ function displayBooks() {
         }
 
     });
-    
-displayStack();
 
 }
 
-function displayStack() {
-
-    const stackView = document.getElementById("stackView");
-    const stackCount = document.getElementById("stackCount");
-
-    if (!stackView || !stackCount) return;
-
-    stackView.innerHTML = "";
-
-    const unreadBooks =
-        books.filter(book => !book.read);
-
-    const colors = [
-    "#e57373",
-    "#64b5f6",
-    "#81c784",
-    "#ffd54f",
-    "#ba68c8",
-    "#ff8a65",
-    "#4db6ac"
-];
-
-unreadBooks.forEach((book, index) => {
-
-    const color = colors[index % colors.length];
-
-    stackView.innerHTML += `
-        <div class="book-stack"
-             style="background:${color};">
-        </div>
-    `;
-});
-
-    stackCount.textContent =
-        `積読 ${unreadBooks.length}冊`;
-
-}
 
 function deleteBook(index) {
     books.splice(index, 1);
@@ -289,7 +250,6 @@ function addRakutenBook(info) {
 
     saveBooks();
     displayBooks();
-    displayStack();
 }
 
 
