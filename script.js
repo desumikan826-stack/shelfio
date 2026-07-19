@@ -15,17 +15,22 @@ function saveBooks() {
     localStorage.setItem("books", JSON.stringify(books));
 }
 
-const { data } =
-await supabase
-.from("books")
-.select("*");
+async function loadBooks() {
 
-books = data;
-displayBooks();
+    const { data, error } = await supabase
+        .from("books")
+        .select("*");
 
-if (savedBooks) {
-    books = JSON.parse(savedBooks);
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    books = data;
+    displayBooks();
 }
+
+loadBooks();
 
 let currentRating = 0;
 
@@ -39,7 +44,7 @@ function setRating(rating) {
     });
 }
 
-function addBook() {
+async function addBook() {
 
     const title = document.getElementById("title").value;
     const author = document.getElementById("author").value;
@@ -60,7 +65,7 @@ function addBook() {
         read:read
 
 });
-    displayBooks();
+    await loadBooks();
     
 
     document.getElementById("title").value = "";
