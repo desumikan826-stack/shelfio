@@ -217,22 +217,31 @@ function displaySearchResult(items) {
     });
 }
 
-function addRakutenBook(info) {
-    books.push({
-        title: info.title,
-        author: info.author,
-        image: info.largeImageUrl,
-        rating: 0,
-        purchased: false,
-        read: false
-    });
+async function addRakutenBook(info) {
 
-    saveBooks();
-    displayBooks();
-    testConnection();
+    await supabase
+        .from("books")
+        .insert({
+            title: info.title,
+            author: info.author,
+            image: info.largeImageUrl,
+            rating: 0,
+            purchased: false,
+            read: false
+        });
 
-    async function testConnection(){
-        const { data, error } = await supabase.from("books").select("*");
-        console.log(data);
-    }
+    await loadBooks();
 }
+
+async function testConnection(){
+    const { data, error } = await supabase.from("books").select("*");
+    console.log(data);
+}
+
+window.searchBook = searchBook;
+window.addBook = addBook;
+window.setRating = setRating;
+window.changeRating = changeRating;
+window.deleteBook = deleteBook;
+window.togglePurchased = togglePurchased;
+window.toggleRead = toggleRead;
