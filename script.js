@@ -108,6 +108,8 @@ function displayBooks() {
 }
 
 function changeRating(index, rating) {
+    console.log("changeRating", index, rating);
+
     books[index].rating = rating;
     saveBooks();
     displayBooks();
