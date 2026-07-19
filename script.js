@@ -1,3 +1,11 @@
+const supabase = window.supabase.createClient(
+    supabaseUrl,
+    supabaseKey
+);
+
+console.log(window.supabase);
+console.log(supabase);
+
 console.log("最新版script.js");
 console.log("script.js 読み込み成功");
 
