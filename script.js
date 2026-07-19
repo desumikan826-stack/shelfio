@@ -114,8 +114,7 @@ function displayStack() {
     unreadBooks.forEach(book => {
 
         stackView.innerHTML += `
-            <img
-                src="${book.image || 'default-book-image.jpg'}"
+            "${book.image || 'default-book-image.jpg'}"
         `;
 
     });
