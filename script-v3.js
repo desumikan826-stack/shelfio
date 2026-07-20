@@ -120,6 +120,46 @@ function setRating(rating) {
     });
 }
 
+async function addBook() {
+    const title = document.getElementById("title").value;
+    const author = document.getElementById("author").value;
+    const purchased = document.getElementById("purchased").checked;
+    const read = document.getElementById("read").checked;
+
+    if (title === "") return;
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error } = await supabase
+        .from("books")
+        .insert({
+            user_id: user.id,
+            title: title,
+            author: author,
+            image: "",
+            rating: currentRating,
+            purchased: purchased,
+            read: read
+        });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    await loadBooks();
+
+    document.getElementById("title").value = "";
+    document.getElementById("author").value = "";
+    document.getElementById("purchased").checked = false;
+    document.getElementById("read").checked = false;
+
+    currentRating = 0;
+    setRating(0);
+}
+
 async function addRakutenBook(info) {
 
     const {
