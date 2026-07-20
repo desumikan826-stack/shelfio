@@ -127,6 +127,7 @@ async function addRakutenBook(info) {
     } = await supabase.auth.getUser();
 
     const { data, error } = await supabase
+        .from("books")
         .insert({
             user_id: user.id,
             title: info.title,
@@ -301,28 +302,6 @@ function displaySearchResult(items) {
         div.appendChild(button);
         result.appendChild(div);
     });
-}
-
-async function addRakutenBook(info) {
-
-    const {
-        data: { user },
-        } = await supabase.auth.getUser();
-
-        await supabase
-            .from("books")
-            .insert({
-            user_id: user.id,
-            title: title,
-            author: author,
-            image: "",
-            rating: currentRating,
-            purchased: purchased,
-            read: read
-        });
-        console.log(error);
-
-    await loadBooks();
 }
 
 async function testConnection(){
