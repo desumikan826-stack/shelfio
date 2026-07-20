@@ -420,8 +420,10 @@ async function searchSRU(keyword, searchType) {
     const index = indexMap[searchType];
 
     const url =
-        `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve&version=1.2&query=${index}="${encodeURIComponent(keyword)}"&maximumRecords=10`;
-
+        `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve` +
+        `&version=1.2` +
+        `&query=${index}="${encodeURIComponent(keyword)}" AND mediatype=1` +
+        `&maximumRecords=10`;
     const response = await fetch(url);
     const xml = await response.text();
 
