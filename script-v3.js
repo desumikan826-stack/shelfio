@@ -188,6 +188,7 @@ function displayBooks() {
     if (!list || !search) return;
 
     const keyword = search.value.toLowerCase();
+    const sortType = document.getElementById("sortType")?.value || "none";
 
     // 本の統計を表示
     if (stats) {
@@ -206,7 +207,19 @@ function displayBooks() {
 
     list.innerHTML = "";
 
-    books.forEach((book, index) => {
+    let sortedBooks = [...books];
+
+    if (sortType === "rating") {
+        sortedBooks.sort((a, b) => b.rating - a.rating);
+    }
+
+    if (sortType === "title") {
+        sortedBooks.sort((a, b) => a.title.localeCompare(b.title, "ja"));
+    }
+
+    sortedBooks.forEach((book) => {
+
+    const index = books.findIndex(b => b.id === book.id);
         // 💡 1. まずキーワード検索にヒットするかチェック
         const matchesKeyword = book.title.toLowerCase().includes(keyword) || 
                              book.author.toLowerCase().includes(keyword);

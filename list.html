@@ -33,10 +33,12 @@
 <!-- もともとある検索バー -->
 
 <div class="search">
-    <input type="text" id="search" placeholder="本を検索..." onkeyup="displayBooks()">
-</div>
 
-<div class="search">
+    <select id="sortType" onchange="displayBooks()">
+        <option value="none">並び替えなし</option>
+        <option value="rating">評価順</option>
+        <option value="title">タイトル順</option>
+    </select>
 
     <input
         type="text"
