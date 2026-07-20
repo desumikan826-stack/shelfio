@@ -5,6 +5,42 @@ if (!window.globalSupabase) {
     window.globalSupabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 }
 const supabase = window.globalSupabase;
+let currentUser = null;
+
+async function signUp(email,password){
+
+    const {error} = await supabase.auth.signUp({
+        email,
+        password
+    });
+
+    if(error) throw error;
+}
+
+async function signIn(email,password){
+
+    const {error} = await supabase.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if(error) throw error;
+}
+
+async function signOut(){
+
+    const {error} = await supabase.auth.signOut();
+
+    if(error) throw error;
+}
+
+supabase.auth.onAuthStateChange((event,session)=>{
+
+    currentUser=session?.user ?? null;
+
+    console.log(event,currentUser);
+
+});
 
 let books = [];
 let currentTab = 'all'; // 💡 今どのタブが選ばれているかを保存（all, want, read）
@@ -265,6 +301,57 @@ function switchTab(tabName) {
 
     // 画面を再表示してフィルターをかける
     displayBooks();
+}
+
+const signinBtn=document.getElementById("signinBtn");
+
+if(signinBtn){
+
+signinBtn.addEventListener("click",async()=>{
+
+    const email=document.getElementById("email").value;
+    const password=document.getElementById("password").value;
+
+    try{
+
+        await signIn(email,password);
+
+        location.href="index.html";
+
+    }catch(e){
+
+        document.getElementById("auth-message").textContent=e.message;
+
+    }
+
+});
+
+}
+
+const signupBtn=document.getElementById("signupBtn");
+
+if(signupBtn){
+
+signupBtn.addEventListener("click",async()=>{
+
+    const email=document.getElementById("email").value;
+    const password=document.getElementById("password").value;
+
+    try{
+
+        await signUp(email,password);
+
+        document.getElementById("auth-message").textContent=
+        "確認メールを送信しました。";
+
+    }catch(e){
+
+        document.getElementById("auth-message").textContent=e.message;
+
+    }
+
+});
+
 }
 
 window.switchTab = switchTab; // HTMLから呼べるように公開

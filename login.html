@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <h2>📚 欲しい本リスト</h2>
+
+    <input type="email" id="email" placeholder="メールアドレス"><br><br>
+
+    <input type="password" id="password" placeholder="パスワード"><br><br>
+
+    <div class="auth-buttons">
+        <button id="signinBtn">ログイン</button>
+        <button id="signupBtn">新規登録</button>
+    </div>
+
+    <p id="auth-message"></p>
+
+    <p><a href="index.html">トップへ戻る</a></p>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script-v3.js" type="module"></script>
+
+</body>
+</html>
