@@ -461,7 +461,14 @@ const {
 
 const page = location.pathname.split("/").pop();
 
-if (!user && (page === "list.html" || page === "search.html")) {
+if (
+    !user &&
+    (
+        page === "list.html" ||
+        page === "search.html" ||
+        page === "settings.html"
+    )
+) {
     location.href = "login.html";
 }
 
@@ -478,3 +485,15 @@ window.togglePurchased = togglePurchased;
 window.toggleRead = toggleRead;
 window.switchTab = switchTab; // 👈 これも忘れずに！
 window.displayBooks = displayBooks;
+
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+
+        await signOut();
+
+        location.href = "login.html";
+
+    });
+}
