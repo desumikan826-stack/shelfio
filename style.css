@@ -228,3 +228,9 @@ nav a:hover{
     border-radius: 8px;
     font-weight: bold;
 }
+
+.book-list{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:20px;
+}
