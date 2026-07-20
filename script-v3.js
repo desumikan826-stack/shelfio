@@ -92,16 +92,19 @@ function saveBooks() {
 }
 
 async function loadBooks() {
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
     const { data, error } = await supabase
         .from("books")
-        .select("*");
+        .select("*")
+        .eq("user_id", user.id);
 
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    books = data;
+    books = data || [];
     displayBooks();
 }
 
@@ -127,14 +130,21 @@ async function addBook() {
 
     await supabase
     .from("books")
-    .insert({
-        title: title,
-        author: author,
-        image: "",
-        rating: currentRating,
-        purchased: purchased,
-        read: read
-    });
+    const {
+    data: { user },
+} = await supabase.auth.getUser();
+
+    await supabase
+        .from("books")
+        .insert({
+            user_id: user.id,
+            title: title,
+            author: author,
+            image: "",
+            rating: currentRating,
+            purchased: purchased,
+            read: read
+        });
 
     await loadBooks();
 
@@ -393,6 +403,16 @@ signupBtn.addEventListener("click",async()=>{
 
 });
 
+}
+
+const {
+    data: { user },
+} = await supabase.auth.getUser();
+
+const page = location.pathname.split("/").pop();
+
+if (!user && (page === "list.html" || page === "search.html")) {
+    location.href = "login.html";
 }
 
 window.switchTab = switchTab; // HTMLから呼べるように公開
