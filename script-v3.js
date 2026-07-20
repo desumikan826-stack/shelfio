@@ -440,6 +440,9 @@ async function searchSRU(keyword, searchType) {
 
     const records = xmlDoc.getElementsByTagName("record");
 
+    const result = document.getElementById("searchResult");
+    result.innerHTML = "";
+
     for (const record of records) {
 
     const data = record.getElementsByTagName("recordData")[0];
@@ -462,9 +465,14 @@ async function searchSRU(keyword, searchType) {
         <h3>${title}</h3>
         <p>著者：${author}</p>
         <p>出版社：${publisher}</p>
+        const button = document.createElement("button");
+        button.textContent = "登録";
+
+        div.appendChild(button);
     `;
 
     result.appendChild(div);
+    }
 }
 
 function displaySearchResult(items) {
@@ -608,4 +616,4 @@ if (logoutBtn) {
         location.href = "login.html";
 
     });
-}}
+}
