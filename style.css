@@ -3,6 +3,39 @@ body{
     background:#f5f5f5;
     margin:30px;
 }
+/* ...他既存のスタイル */
+
+/* 💡 ログイン画面用のスタイルを追加 */
+.login-container {
+    width: 350px;
+    margin: 50px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.auth-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+#auth-message {
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.error-message {
+    color: red;
+}
 
 .form{
     margin-top:30px;
