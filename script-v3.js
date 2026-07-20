@@ -34,13 +34,53 @@ async function signOut(){
     if(error) throw error;
 }
 
-supabase.auth.onAuthStateChange((event,session)=>{
+supabase.auth.onAuthStateChange((event, session) => {
 
-    currentUser=session?.user ?? null;
+    currentUser = session?.user ?? null;
 
-    console.log(event,currentUser);
+    console.log(event, currentUser);
+
+    updateUI();
 
 });
+
+async function updateUI() {
+
+    const {
+        data: { session }
+    } = await supabase.auth.getSession();
+
+    currentUser = session?.user ?? null;
+
+    const nav = document.querySelector("nav");
+    const message = document.getElementById("welcome-message");
+
+    if (currentUser) {
+
+        if (nav) nav.style.display = "flex";
+
+        if (message) {
+            message.innerHTML = `
+            ようこそ、${currentUser.email} さん！<br><br>
+            上のメニューから機能を選択してください。
+            `;
+        }
+
+    } else {
+
+        if (nav) nav.style.display = "none";
+
+        if (message) {
+            message.innerHTML = `
+            ログインしてください。<br><br>
+            <a href="login.html">ログイン / 新規登録</a>
+            `;
+        }
+
+    }
+}
+
+updateUI();
 
 let books = [];
 let currentTab = 'all'; // 💡 今どのタブが選ばれているかを保存（all, want, read）
