@@ -1,9 +1,6 @@
-
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    
     <meta charset="UTF-8">
     <title>欲しい本リスト</title>
     <link rel="stylesheet" href="style.css">
@@ -11,7 +8,7 @@
 
 <header>
     <div class="logo">
-        📚 欲しい本リスト
+          📚 欲しい本リスト
     </div>
 
     <nav>
@@ -36,7 +33,6 @@
 <div class="form">
     <input id="title" placeholder="本のタイトル">
     <input id="author" placeholder="著者">
-
 <div id="rating" class="rating">
     <span onclick="setRating(1)">☆</span>
     <span onclick="setRating(2)">☆</span>
@@ -53,13 +49,12 @@
     読了済み
 </label>
 </div>
-
 <button onclick="addBook()">登録</button>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script-v3.js" type="module"></script>
 
 </body>
+
 </html>
