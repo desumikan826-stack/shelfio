@@ -137,7 +137,7 @@ async function addBook() {
         author: author,
         image: "",
         isbn: "",
-        publisher: "",
+        publisher: "publisher",
         publish_date: "",
         pages: 0,
         rating: currentRating,
@@ -413,7 +413,7 @@ async function searchSRU(keyword, searchType) {
     const indexMap = {
         title: "title",
         author: "creator",
-        publisher: "publisher",
+        publisherName: "publisher",
         isbn: "isbn"
     };
 
@@ -465,11 +465,14 @@ async function searchSRU(keyword, searchType) {
         <h3>${title}</h3>
         <p>著者：${author}</p>
         <p>出版社：${publisher}</p>
-        const button = document.createElement("button");
-        button.textContent = "登録";
-
-        div.appendChild(button);
     `;
+
+    const button = document.createElement("button");
+    button.textContent = "登録";
+
+    div.appendChild(button);
+
+    result.appendChild(div);
 
     result.appendChild(div);
     }
