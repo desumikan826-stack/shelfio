@@ -608,4 +608,4 @@ if (logoutBtn) {
         location.href = "login.html";
 
     });
-}
+}}
