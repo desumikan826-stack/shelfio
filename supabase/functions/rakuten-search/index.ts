@@ -24,6 +24,7 @@ serve(async (req) => {
       );
     }
 
+    // secretはSupabaseダッシュボード、またはCLIで設定する（コードには書かない）
     const APPLICATION_ID = Deno.env.get("RAKUTEN_APPLICATION_ID");
     const ACCESS_KEY = Deno.env.get("RAKUTEN_ACCESS_KEY");
 
@@ -34,6 +35,9 @@ serve(async (req) => {
       );
     }
 
+    // 許可されたWebサイトとして登録したドメイン（楽天アプリ設定と一致させる必要がある）
+    const SITE_ORIGIN = "https://desumikan826-stack.github.io";
+
     const url =
       "https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404" +
       "?applicationId=" + encodeURIComponent(APPLICATION_ID) +
@@ -42,7 +46,11 @@ serve(async (req) => {
       "&format=json";
 
     const rakutenRes = await fetch(url, {
-      headers: { accessKey: ACCESS_KEY },
+      headers: {
+        accessKey: ACCESS_KEY,
+        Origin: SITE_ORIGIN,
+        Referer: SITE_ORIGIN,
+      },
     });
 
     if (!rakutenRes.ok) {
