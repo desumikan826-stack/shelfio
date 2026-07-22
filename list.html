@@ -25,11 +25,25 @@
 
 <body>
     <!-- list.html の検索バーの上あたりに追加 -->
+
 <div class="tabs">
-    <button onclick="switchTab('all')" id="tab-all" class="tab-btn active">すべて</button>
-    <button onclick="switchTab('want')" id="tab-want" class="tab-btn">欲しい本</button>
-    <button onclick="switchTab('read')" id="tab-read" class="tab-btn">読んだ本</button>
+    <button onclick="switchTab('all')" id="tab-all" class="tab-btn active">
+        すべて
+    </button>
+
+    <button onclick="switchTab('unread')" id="tab-unread" class="tab-btn">
+        未読
+    </button>
+
+    <button onclick="switchTab('reading')" id="tab-reading" class="tab-btn">
+        読書中
+    </button>
+
+    <button onclick="switchTab('finished')" id="tab-finished" class="tab-btn">
+        読了済み
+    </button>
 </div>
+
 <!-- もともとある検索バー -->
 
 <div class="search">

@@ -144,7 +144,7 @@ async function addBook() {
     const title = document.getElementById("title").value;
     const author = document.getElementById("author").value;
     const purchased = document.getElementById("purchased").checked;
-    const read = document.getElementById("read").checked;
+    const status = document.getElementById("status").value;
 
     if (title === "") return;
 
@@ -163,7 +163,7 @@ async function addBook() {
         pages: 0,
         rating: currentRating,
         purchased: purchased,
-        read: read
+        status: status
     });
 
     if (error) {
@@ -177,9 +177,9 @@ async function addBook() {
     alert("登録しました");
 
     document.getElementById("title").value = "";
-    document.getElementById("author").value = "";   
+    document.getElementById("author").value = "";
     document.getElementById("purchased").checked = false;
-    document.getElementById("read").checked = false;
+    document.getElementById("status").value = "unread";
 
     currentRating = 0;
     setRating(0);
@@ -202,7 +202,7 @@ async function addRakutenBook(info) {
         pages: 0,
         rating: 0,
         purchased: false,
-        read: false
+        status: "unread"
     });
 
     if (error) {
@@ -229,8 +229,19 @@ function displayBooks() {
     // 本の統計を表示
     if (stats) {
         const total = books.length;
-        const unread = books.filter(book => !book.read).length;
-        const read = books.filter(book => book.read).length;
+        const unread = books.filter(book => book.status === "unread").length;
+        const reading = books.filter(book => book.status === "reading").length;
+        const finished = books.filter(book => book.status === "finished").length;
+
+        const rate = total === 0 ? 0 : Math.round(finished / total * 100);
+
+        stats.innerHTML = `
+        📚 総数：${total}冊　
+        📖 未読：${unread}冊　
+        📘 読書中：${reading}冊　
+        ✅ 読了：${finished}冊　
+        📊 読了率：${rate}%
+`;
         const rate = total === 0 ? 0 : Math.round(read / total * 100);
 
         stats.innerHTML = `
@@ -259,18 +270,18 @@ function displayBooks() {
 
     sortedBooks.forEach((book) => {
         // 💡 1. まずキーワード検索にヒットするかチェック
-        const matchesKeyword = book.title.toLowerCase().includes(keyword) || 
-                             book.author.toLowerCase().includes(keyword);
+        const matchesKeyword = book.title.toLowerCase().includes(keyword) || book.author.toLowerCase().includes(keyword);
 
         // 💡 2. 次に、現在のタブの条件に一致するかチェック
+        l
         let matchesTab = false;
-        if (currentTab === 'all') {
-            matchesTab = true; // 「すべて」なら無条件でOK
-        } else if (currentTab === 'want') {
-            matchesTab = !book.read; // 「欲しい本」なら、readがfalse（未読）のものだけ
-        } else if (currentTab === 'read') {
-            matchesTab = book.read; // 「読んだ本」なら、readがtrue（読了）のものだけ
-        }
+
+        if (currentTab === "all") {
+            matchesTab = true;
+        } else {
+            matchesTab = book.status === currentTab;
+    }
+
 
         // 💡 両方の条件をクリアした本だけを表示する
         if (matchesKeyword && matchesTab) {
@@ -299,10 +310,14 @@ function displayBooks() {
                         </button>
                     </p>
                     <p>
-                        読書：${book.read ? "読了済み" : "未読"}
-                        <button onclick="toggleRead('${book.id}')">
-                            ${book.read ? "未読に戻す" : "読了済みにする"}
-                        </button>
+                        <p>
+                        読書状況：
+                        <select onchange="changeStatus('${book.id}', this.value)">
+                            <option value="unread" ${book.status==="unread"?"selected":""}>未読</option>
+                            <option value="reading" ${book.status==="reading"?"selected":""}>読書中</option>
+                            <option value="finished" ${book.status==="finished"?"selected":""}>読了済み</option>
+                        </select>
+                        </p>
                     </p>
                     <button onclick="deleteBook('${book.id}')">削除</button>
                 </div>
@@ -372,25 +387,22 @@ async function togglePurchased(bookId) {
     await loadBooks();
 }
 
-async function toggleRead(bookId) {
-    const book = books.find(b => String(b.id) === String(bookId));
-    if (!book) return;
 
+async function changeStatus(bookId, status) {
     const { error } = await supabase
         .from("books")
-        .update({
-            read: !book.read
-        })
-        .eq("id", book.id);
+        .update({ status })
+        .eq("id", bookId);
 
     if (error) {
         console.error(error);
-        alert("読書状態の更新に失敗しました。もう一度お試しください。");
+        alert("読書状態の更新に失敗しました");
         return;
     }
 
     await loadBooks();
 }
+
 
 function openSettings() {
     document.getElementById("settingsModal").style.display = "block";
@@ -532,8 +544,10 @@ function switchTab(tabName) {
 
     // すべてのボタンから active クラスを一度消す
     document.getElementById("tab-all")?.classList.remove("active");
-    document.getElementById("tab-want")?.classList.remove("active");
-    document.getElementById("tab-read")?.classList.remove("active");
+    document.getElementById("tab-unread")?.classList.remove("active");
+    document.getElementById("tab-reading")?.classList.remove("active");
+    document.getElementById("tab-finished")?.classList.remove("active");
+
 
     // クリックされたボタンだけに active クラスをつける
     document.getElementById(`tab-${tabName}`)?.classList.add("active");
@@ -623,6 +637,7 @@ window.changeRating = changeRating;
 window.togglePurchased = togglePurchased;
 window.toggleRead = toggleRead;
 window.displayBooks = displayBooks;
+window.changeStatus = changeStatus;
 
 const logoutBtn = document.getElementById("logoutBtn");
 

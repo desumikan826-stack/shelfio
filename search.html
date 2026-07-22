@@ -59,8 +59,15 @@
 </label>
 
 <label>
-    <input type="checkbox" id="read">
-    読了済み
+    <label>
+    読書状況
+    <select onchange="changeStatus('${book.id}', this.value)">
+        <option value="unread" ${book.status === "unread" ? "selected" : ""}>未読</option>
+        <option value="reading" ${book.status === "reading" ? "selected" : ""}>読書中</option>
+        <option value="finished" ${book.status === "finished" ? "selected" : ""}>読了済み</option>
+    </select>
+
+    </label>
 </label>
 </div>
 <button onclick="addBook()">登録</button>
