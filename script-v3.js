@@ -301,10 +301,16 @@ function displayBooks() {
 
                     <p>
                         読書状況：
-                        <select onchange="changeStatus('${book.id}', this.value)">
-                            <option value="unread" ${book.status === "unread" ? "selected" : ""}>未読</option>
-                            <option value="reading" ${book.status === "reading" ? "selected" : ""}>読書中</option>
-                            <option value="finished" ${book.status === "finished" ? "selected" : ""}>読了済み</option>
+                        <button onclick="this.nextElementSibling.style.display='inline-block'; this.style.display='none';">
+                            ${book.status === "unread" ? "未読" :book.status === "reading" ? "読書中" : "読了済み"}
+                        </button>
+
+                        <select
+                            style="display:none"
+                            onchange="changeStatus('${book.id}', this.value)">
+                            <option value="unread" ${book.status==="unread"?"selected":""}>未読</option>
+                            <option value="reading" ${book.status==="reading"?"selected":""}>読書中</option>
+                            <option value="finished" ${book.status==="finished"?"selected":""}>読了済み</option>
                         </select>
                     </p>
 
