@@ -260,19 +260,48 @@ function displayBooks() {
     // 一旦配列にHTML文字列をためて最後にまとめて書き込む
     const htmlParts = [];
 
-    sortedBooks.forEach((book) => {
-        // 💡 1. まずキーワード検索にヒットするかチェック
-        const matchesKeyword = book.title.toLowerCase().includes(keyword) || book.author.toLowerCase().includes(keyword);
+sortedBooks.forEach((book) => {
 
-        // 💡 2. 次に、現在のタブの条件に一致するかチェック
-        l
-        let matchesTab = false;
+    const matchesKeyword =
+        book.title.toLowerCase().includes(keyword) ||
+        book.author.toLowerCase().includes(keyword);
 
-        if (currentTab === "all") {
-            matchesTab = true;
-        } else {
-            matchesTab = book.status === currentTab;
+    let matchesTab = false;
+
+    if (currentTab === "all") {
+        matchesTab = true;
+    } else {
+        matchesTab = book.status === currentTab;
     }
+
+    if (matchesKeyword && matchesTab) {
+
+        htmlParts.push(`
+            <div class="book">
+                <h3>${escapeHTML(book.title)}</h3>
+                <p>著者：${escapeHTML(book.author)}</p>
+
+                <select onchange="changeStatus('${book.id}', this.value)">
+                    <option value="unread" ${book.status === "unread" ? "selected" : ""}>
+                        未読
+                    </option>
+                    <option value="reading" ${book.status === "reading" ? "selected" : ""}>
+                        読書中
+                    </option>
+                    <option value="finished" ${book.status === "finished" ? "selected" : ""}>
+                        読了済み
+                    </option>
+                </select>
+
+                <button onclick="deleteBook('${book.id}')">
+                    削除
+                </button>
+            </div>
+        `);
+
+    }
+});
+
 
 
         // 💡 両方の条件をクリアした本だけを表示する
@@ -627,9 +656,8 @@ window.addBook = addBook;
 window.deleteBook = deleteBook;
 window.changeRating = changeRating;
 window.togglePurchased = togglePurchased;
-window.toggleRead = toggleRead;
-window.displayBooks = displayBooks;
 window.changeStatus = changeStatus;
+window.displayBooks = displayBooks;
 
 const logoutBtn = document.getElementById("logoutBtn");
 
