@@ -260,92 +260,62 @@ function displayBooks() {
     // 一旦配列にHTML文字列をためて最後にまとめて書き込む
     const htmlParts = [];
 
-sortedBooks.forEach((book) => {
+    sortedBooks.forEach((book) => {
 
     const matchesKeyword =
         book.title.toLowerCase().includes(keyword) ||
         book.author.toLowerCase().includes(keyword);
 
-    let matchesTab = false;
-
-    if (currentTab === "all") {
-        matchesTab = true;
-    } else {
-        matchesTab = book.status === currentTab;
-    }
+    const matchesTab =
+        currentTab === "all" || book.status === currentTab;
 
     if (matchesKeyword && matchesTab) {
 
         htmlParts.push(`
             <div class="book">
-                <h3>${escapeHTML(book.title)}</h3>
-                <p>著者：${escapeHTML(book.author)}</p>
-
-                <select onchange="changeStatus('${book.id}', this.value)">
-                    <option value="unread" ${book.status === "unread" ? "selected" : ""}>
-                        未読
-                    </option>
-                    <option value="reading" ${book.status === "reading" ? "selected" : ""}>
-                        読書中
-                    </option>
-                    <option value="finished" ${book.status === "finished" ? "selected" : ""}>
-                        読了済み
-                    </option>
-                </select>
-
-                <button onclick="deleteBook('${book.id}')">
-                    削除
-                </button>
-            </div>
-        `);
-
-    }
-});
-
-
-
-        // 💡 両方の条件をクリアした本だけを表示する
-        if (matchesKeyword && matchesTab) {
-            htmlParts.push(`
-            <div class="book">
                 <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image">
+
                 <div class="book-info">
                     <h3>${escapeHTML(book.title)}</h3>
                     <p>著者：${escapeHTML(book.author)}</p>
                     <p>出版社：${escapeHTML(book.publisher || "不明")}</p>
                     <p>ページ数：${escapeHTML(book.pages || 0)}ページ</p>
                     <p>ISBN：${escapeHTML(book.isbn || "なし")}</p>
+
                     <p>
                         評価：
                         ${book.rating === 0 ? "<span class='no-rating'>未評価</span>" : ""}
                         ${[1,2,3,4,5].map(star => `
                             <span onclick="changeRating('${book.id}', ${star})" class="star">
-                            ${star <= book.rating ? "★" : "☆"}
+                                ${star <= book.rating ? "★" : "☆"}
                             </span>
                         `).join("")}
                     </p>
+
                     <p>
                         購入：${book.purchased ? "購入済み" : "未購入"}
                         <button onclick="togglePurchased('${book.id}')">
                             ${book.purchased ? "未購入に戻す" : "購入済みにする"}
                         </button>
                     </p>
+
                     <p>
-                        <p>
                         読書状況：
                         <select onchange="changeStatus('${book.id}', this.value)">
-                            <option value="unread" ${book.status==="unread"?"selected":""}>未読</option>
-                            <option value="reading" ${book.status==="reading"?"selected":""}>読書中</option>
-                            <option value="finished" ${book.status==="finished"?"selected":""}>読了済み</option>
+                            <option value="unread" ${book.status === "unread" ? "selected" : ""}>未読</option>
+                            <option value="reading" ${book.status === "reading" ? "selected" : ""}>読書中</option>
+                            <option value="finished" ${book.status === "finished" ? "selected" : ""}>読了済み</option>
                         </select>
-                        </p>
                     </p>
+
                     <button onclick="deleteBook('${book.id}')">削除</button>
                 </div>
             </div>
-            `);
-        }
-    });
+        `);
+
+    }
+
+});
 
     list.innerHTML = htmlParts.join("");
 }
