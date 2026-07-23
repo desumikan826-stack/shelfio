@@ -250,3 +250,24 @@ nav a:hover{
     padding: 6px;
     font-size: 16px;
 }
+
+.status-buttons {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 6px;
+}
+
+.status-btn {
+    padding: 4px 10px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.status-btn.active {
+    background: #0070f3;
+    color: white;
+    border-color: #0070f3;
+}
