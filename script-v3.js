@@ -583,7 +583,7 @@ signinBtn.addEventListener("click",async()=>{
 
     const email=document.getElementById("email").value;
     const password=document.getElementById("password").value;
-
+    const password=document.getElementById("password").value;
     try{
 
         await signIn(email,password);
@@ -609,7 +609,7 @@ signupBtn.addEventListener("click",async()=>{
 
     const email=document.getElementById("email").value;
     const password=document.getElementById("password").value;
-
+    const password=document.getElementById("password").value;
     try{
 
         await signUp(email,password);
@@ -637,7 +637,8 @@ signupBtn.addEventListener("click",async()=>{
         (
             page === "list.html" ||
             page === "search.html" ||
-            page === "settings.html"
+            page === "settings.html" ||
+            page === "updates.html"
         )
     ) {
         location.href = "login.html";
@@ -655,6 +656,11 @@ window.changeRating = changeRating;
 window.togglePurchased = togglePurchased;
 window.changeStatus = changeStatus;
 window.displayBooks = displayBooks;
+window.addScheduleItem = addScheduleItem;
+window.deleteScheduleItem = deleteScheduleItem;
+window.handleExistingBookChange = handleExistingBookChange;
+window.handleFrequencyChange = handleFrequencyChange;
+window.renderSchedulePage = renderSchedulePage;
 
 const logoutBtn = document.getElementById("logoutBtn");
 
@@ -664,3 +670,4 @@ if (logoutBtn) {
         location.href = "login.html";
     });
 }
+

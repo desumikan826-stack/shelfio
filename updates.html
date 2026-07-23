@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>更新スケジュール</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+
+<header>
+    <div class="logo">
+        📚 Shelfio
+    </div>
+
+    <nav>
+        <a href="search.html">🔍 検索</a>
+        <a href="list.html">📚 本棚</a>
+        <a href="updates.html">🗓 更新</a>
+        <button id="logoutBtn">ログアウト</button>
+    </nav>
+</header>
+
+<body>
+    <main>
+        <h2>更新スケジュール</h2>
+
+        <section class="schedule-summary">
+            <h3>今日更新</h3>
+            <div id="todayUpdates"></div>
+        </section>
+
+        <section class="schedule-form">
+            <h3>新しい更新スケジュールを登録</h3>
+            <div class="form">
+                <label>
+                    登録済み作品
+                    <select id="existingBook" onchange="handleExistingBookChange()">
+                        <option value="">手動で入力</option>
+                    </select>
+                </label>
+
+                <label>
+                    タイトル
+                    <input id="scheduleTitle" placeholder="作品タイトル">
+                </label>
+
+                <label>
+                    著者
+                    <input id="scheduleAuthor" placeholder="著者名">
+                </label>
+
+                <label>
+                    更新頻度
+                    <select id="scheduleFrequency" onchange="handleFrequencyChange()">
+                        <option value="weekly">週刊</option>
+                        <option value="biweekly">隔週</option>
+                    </select>
+                </label>
+
+                <label>
+                    更新曜日
+                    <select id="scheduleWeekday">
+                        <option value="0">日曜日</option>
+                        <option value="1">月曜日</option>
+                        <option value="2">火曜日</option>
+                        <option value="3">水曜日</option>
+                        <option value="4">木曜日</option>
+                        <option value="5">金曜日</option>
+                        <option value="6">土曜日</option>
+                    </select>
+                </label>
+
+                <label>
+                    隔週開始日
+                    <input id="scheduleStartDate" type="date">
+                </label>
+
+                <button type="button" onclick="addScheduleItem()">登録</button>
+            </div>
+        </section>
+
+        <section class="schedule-list">
+            <h3>登録済みスケジュール</h3>
+            <div id="scheduleList"></div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script-v3.js" type="module"></script>
+</body>
+
+</html>
