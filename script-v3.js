@@ -470,57 +470,6 @@ async function fetchRakutenResults(keyword, searchType) {
     });
 }
 
-    const index = indexMap[searchType];
-
-    const url =
-        `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve` +
-        `&version=1.2` +
-        `&recordSchema=dcndl` +
-        `&query=${index}="${encodeURIComponent(keyword)}"` +
-        `&maximumRecords=10`;
-
-    const response = await fetch(url);
-    const xml = await response.text();
-
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xml, "text/xml");
-    const records = xmlDoc.getElementsByTagName("record");
-
-    const results = [];
-
-    for (const record of records) {
-        const data = record.getElementsByTagName("recordData")[0];
-        const doc = parser.parseFromString(data.textContent, "text/xml");
-
-        const title = doc.getElementsByTagName("dc:title")[0]?.textContent || "";
-        const author = doc.getElementsByTagName("dc:creator")[0]?.textContent || "";
-        const publisher = doc.getElementsByTagName("dc:publisher")[0]?.textContent || "";
-
-        // xsi:type="dcndl:ISBN" が付いた識別子だけをISBNとして扱う
-        let isbn = "";
-        const identifiers = doc.getElementsByTagName("dc:identifier");
-        for (const id of identifiers) {
-            if (id.getAttribute("xsi:type") === "dcndl:ISBN") {
-                isbn = (id.textContent || "").replace(/-/g, "");
-                break;
-            }
-        }
-
-        results.push({
-            title,
-            author,
-            publisherName: publisher,
-            salesDate: "",
-            itemPrice: "",
-            largeImageUrl: isbn ? `https://ndlsearch.ndl.go.jp/thumbnail/${isbn}.jpg` : "",
-            isbn,
-            source: "ndl"
-        });
-    }
-
-    return results;
-}
-
 function displaySearchResult(items) {
     const result = document.getElementById("searchResult");
     if (!result) return;
