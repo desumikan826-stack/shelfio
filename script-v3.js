@@ -494,6 +494,7 @@ async function fetchNdlResults(keyword, searchType) {
     const url =
         `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve` +
         `&version=1.2` +
+        `&recordSchema=dcndl` +
         `&query=${index}="${encodeURIComponent(keyword)}"` +
         `&maximumRecords=10`;
 
