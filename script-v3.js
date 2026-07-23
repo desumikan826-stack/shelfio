@@ -425,37 +425,54 @@ async function searchBook() {
 
     const keyword = input.value;
     const searchType = document.getElementById("searchType").value;
-    const apiType = document.getElementById("apiType").value;
     if (keyword === "") return;
 
     try {
-        if (apiType === "rakuten") {
+        // 楽天とNDLを同時に検索する
+        const [rakutenItems, ndlItems] = await Promise.all([
+            fetchRakutenResults(keyword, searchType),
+            fetchNdlResults(keyword, searchType)
+        ]);
 
-            // APIキーはクライアントに置かず、Supabase Edge Function経由でRakutenを呼び出す
-            const { data, error } = await supabase.functions.invoke("rakuten-search", {
-                body: { keyword, searchType },
-            });
+        // 重複を取り除いて1つのリストにまとめる
+        const mergedItems = mergeResults(rakutenItems, ndlItems);
 
-            if (error) {
-                console.error(error);
-                alert("検索に失敗しました。もう一度お試しください。");
-                return;
-            }
+        displaySearchResult(mergedItems);
 
-            displaySearchResult(data.Items);
-
-        } else {
-
-            await searchSRU(keyword, searchType);
-
-        }
     } catch (e) {
         console.error(e);
+        alert("検索に失敗しました。もう一度お試しください。");
     }
 }
 
-async function searchSRU(keyword, searchType) {
+// 楽天ブックスAPIの結果を、共通の形（title, author, isbnなど）に揃えて返す
+async function fetchRakutenResults(keyword, searchType) {
+    const { data, error } = await supabase.functions.invoke("rakuten-search", {
+        body: { keyword, searchType },
+    });
 
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return (data.Items || []).map((item) => {
+        const info = item.Item;
+        return {
+            title: info.title,
+            author: info.author,
+            publisherName: info.publisherName || "",
+            salesDate: info.salesDate || "",
+            itemPrice: info.itemPrice || "",
+            largeImageUrl: info.largeImageUrl || "",
+            isbn: (info.isbn || "").replace(/-/g, ""),
+            source: "rakuten"
+        };
+    });
+}
+
+// NDL(国立国会図書館)APIの結果を、同じ共通の形に揃えて返す
+async function fetchNdlResults(keyword, searchType) {
     const indexMap = {
         title: "title",
         author: "creator",
@@ -472,49 +489,69 @@ async function searchSRU(keyword, searchType) {
         `&maximumRecords=10`;
 
     const response = await fetch(url);
-
     const xml = await response.text();
-
 
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xml, "text/xml");
-
     const records = xmlDoc.getElementsByTagName("record");
 
-    const result = document.getElementById("searchResult");
-    result.innerHTML = "";
+    const results = [];
 
     for (const record of records) {
+        const data = record.getElementsByTagName("recordData")[0];
+        const doc = parser.parseFromString(data.textContent, "text/xml");
 
-    const data = record.getElementsByTagName("recordData")[0];
+        const title = doc.getElementsByTagName("dc:title")[0]?.textContent || "";
+        const author = doc.getElementsByTagName("dc:creator")[0]?.textContent || "";
+        const publisher = doc.getElementsByTagName("dc:publisher")[0]?.textContent || "";
 
-    const doc = parser.parseFromString(data.textContent, "text/xml");
+        // ISBNらしき識別子を探す
+        let isbn = "";
+        const identifiers = doc.getElementsByTagName("dc:identifier");
+        for (const id of identifiers) {
+            const cleaned = (id.textContent || "").replace(/-/g, "");
+            if (/^[0-9]{10}([0-9]{3})?$/.test(cleaned)) {
+                isbn = cleaned;
+                break;
+            }
+        }
 
-    const title =
-        doc.getElementsByTagName("dc:title")[0]?.textContent || "";
-
-    const author =
-        doc.getElementsByTagName("dc:creator")[0]?.textContent || "";
-
-    const publisher =
-        doc.getElementsByTagName("dc:publisher")[0]?.textContent || "";
-
-    const div = document.createElement("div");
-    div.className = "book";
-
-    div.innerHTML = `
-        <h3>${escapeHTML(title)}</h3>
-        <p>著者：${escapeHTML(author)}</p>
-        <p>出版社：${escapeHTML(publisher)}</p>
-    `;
-
-    const button = document.createElement("button");
-    button.textContent = "登録";
-
-    div.appendChild(button);
-
-    result.appendChild(div);
+        results.push({
+            title,
+            author,
+            publisherName: publisher,
+            salesDate: "",
+            itemPrice: "",
+            largeImageUrl: "",
+            isbn,
+            source: "ndl"
+        });
     }
+
+    return results;
+}
+
+// 同じ本かどうかを判定する（ISBNが一致、またはタイトル＋著者が一致）
+function isSameBook(a, b) {
+    if (a.isbn && b.isbn && a.isbn === b.isbn) return true;
+
+    const normalize = (str) => (str || "").replace(/\s/g, "").toLowerCase();
+    return normalize(a.title) === normalize(b.title) &&
+    normalize(a.author) === normalize(b.author);
+}
+
+// 楽天の結果をベースに、NDLにしかない本だけを追加してまとめる
+function mergeResults(rakutenItems, ndlItems) {
+    const merged = [...rakutenItems];
+
+    ndlItems.forEach((ndlItem) => {
+        const isDuplicate = merged.some((item) => isSameBook(item, ndlItem));
+        if (!isDuplicate) {
+            merged.push(ndlItem);
+        }
+    });
+
+    return merged;
 }
 
 function displaySearchResult(items) {
@@ -523,16 +560,15 @@ function displaySearchResult(items) {
 
     result.innerHTML = "";
 
-    items.forEach((item) => {
-        const info = item.Item;
+    items.forEach((info) => {
         const div = document.createElement("div");
         div.className = "book";
         div.innerHTML = `
             <img src="${escapeHTML(info.largeImageUrl || "")}">
             <h3>${escapeHTML(info.title)}</h3>
             <p>著者：${escapeHTML(info.author)}</p>
-            <p>発売日：${escapeHTML(info.salesDate)}</p>
-            <p>価格：${escapeHTML(info.itemPrice)}円</p>
+            <p>発売日：${escapeHTML(info.salesDate || "不明")}</p>
+            <p>価格：${escapeHTML(info.itemPrice || "不明")}円</p>
         `;
 
         const button = document.createElement("button");
