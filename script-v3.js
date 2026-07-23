@@ -514,13 +514,12 @@ async function fetchNdlResults(keyword, searchType) {
         const author = doc.getElementsByTagName("dc:creator")[0]?.textContent || "";
         const publisher = doc.getElementsByTagName("dc:publisher")[0]?.textContent || "";
 
-        // ISBNらしき識別子を探す
+        // xsi:type="dcndl:ISBN" が付いた識別子だけをISBNとして扱う
         let isbn = "";
         const identifiers = doc.getElementsByTagName("dc:identifier");
         for (const id of identifiers) {
-            const cleaned = (id.textContent || "").replace(/-/g, "");
-            if (/^[0-9]{10}([0-9]{3})?$/.test(cleaned)) {
-                isbn = cleaned;
+            if (id.getAttribute("xsi:type") === "dcndl:ISBN") {
+                isbn = (id.textContent || "").replace(/-/g, "");
                 break;
             }
         }
