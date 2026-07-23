@@ -274,8 +274,7 @@ nav a:hover{
 
 .status-wrap {
     position: relative;
-    display: inline-block;
-    margin: 15px 0; /* 追加：購入済みの<p>と同じ間隔に */
+    margin: 15px 0;
 }
 
 .status-current {
