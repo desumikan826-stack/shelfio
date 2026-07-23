@@ -299,19 +299,17 @@ function displayBooks() {
                         </button>
                     </p>
 
-                    <p>
+                    <p class="status-wrap">
                         読書状況：
-                        <span class="status-buttons">
-                            <button
-                                class="status-btn ${book.status === "unread" ? "active" : ""}"
-                                onclick="changeStatus('${book.id}', 'unread')">未読</button>
-                            <button
-                                class="status-btn ${book.status === "reading" ? "active" : ""}"
-                                onclick="changeStatus('${book.id}', 'reading')">読書中</button>
-                            <button
-                                class="status-btn ${book.status === "finished" ? "active" : ""}"
-                                onclick="changeStatus('${book.id}', 'finished')">読了済み</button>
-                        </span>
+                        <button class="status-current" onclick="toggleStatusMenu('${book.id}')">
+                            ${book.status === "unread" ? "未読" : book.status === "reading" ? "読書中" : "読了済み"} ▾
+                        </button>
+
+                        <div id="statusMenu-${book.id}" class="status-menu" style="display:none;">
+                            <button onclick="changeStatus('${book.id}', 'unread')">未読</button>
+                            <button onclick="changeStatus('${book.id}', 'reading')">読書中</button>
+                            <button onclick="changeStatus('${book.id}', 'finished')">読了済み</button>
+                        </div>
                     </p>
 
                     <button onclick="deleteBook('${book.id}')">削除</button>
@@ -398,7 +396,15 @@ async function changeStatus(bookId, status) {
     }
 
     await loadBooks();
+    document.getElementById(`statusMenu-${bookId}`)?.style.setProperty("display", "none");
 }
+
+function toggleStatusMenu(bookId) {
+    const menu = document.getElementById(`statusMenu-${bookId}`);
+    if (!menu) return;
+    menu.style.display = menu.style.display === "none" ? "block" : "none";
+}
+window.toggleStatusMenu = toggleStatusMenu;
 
 
 function openSettings() {
