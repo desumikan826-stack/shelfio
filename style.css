@@ -367,3 +367,53 @@ nav a:hover{
 .schedule-form .form button:hover {
     background: #005ac8;
 }
+
+.reading-calendar,
+.today-updates {
+    margin-bottom: 24px;
+}
+
+.reading-calendar h2,
+.today-updates h2 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.calendar-day {
+    background: white;
+    border: 1px solid #e0e7ff;
+    border-radius: 14px;
+    padding: 12px;
+    min-height: 130px;
+}
+
+.calendar-day.today {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, .12);
+}
+
+.calendar-day-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.calendar-item {
+    background: #f7f9ff;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+
+.calendar-item.empty {
+    background: transparent;
+    color: #777;
+    margin-bottom: 0;
+}
+
+}

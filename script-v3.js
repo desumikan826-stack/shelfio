@@ -212,6 +212,83 @@ function isItemUpdatingToday(item) {
     return weekDelta % 2 === 0;
 }
 
+function getWeekStartDate(reference) {
+    const date = new Date(reference);
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - date.getDay());
+    return date;
+}
+
+function getBiweeklyStartDateForDate(item, referenceDate) {
+    if (item.startDate) {
+        const parsed = new Date(item.startDate);
+        if (!Number.isNaN(parsed.getTime())) {
+            return parsed;
+        }
+    }
+
+    const date = new Date(referenceDate);
+    const target = getDateOfWeekday(date, item.weekday);
+    if (target > date) {
+        target.setDate(target.getDate() - 7);
+    }
+    return target;
+}
+
+function isItemUpdatingOnDate(item, date) {
+    if (String(item.weekday) !== String(date.getDay())) return false;
+    if (item.frequency === "weekly") return true;
+
+    const startDate = getBiweeklyStartDateForDate(item, date);
+    const diffDays = Math.floor((date.setHours(0, 0, 0, 0) - startDate.setHours(0, 0, 0, 0)) / (24 * 60 * 60 * 1000));
+    const weekDelta = Math.floor(diffDays / 7);
+    return weekDelta % 2 === 0;
+}
+
+function renderReadingCalendar(items) {
+    const calendarContainer = document.getElementById("readingCalendar");
+    if (!calendarContainer) return;
+
+    const weekStart = getWeekStartDate(new Date());
+    const days = Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(weekStart);
+        date.setDate(date.getDate() + index);
+        const dayItems = items.filter((item) => isItemUpdatingOnDate(item, new Date(date)));
+        return {
+            date,
+            items: dayItems,
+        };
+    });
+
+    calendarContainer.innerHTML = `
+        <div class="calendar-grid">
+            ${days
+                .map((day) => {
+                    const todayClass = day.date.toDateString() === new Date().toDateString() ? " today" : "";
+                    return `
+                        <div class="calendar-day${todayClass}">
+                            <div class="calendar-day-label">
+                                ${escapeHTML(getWeekdayLabel(day.date.getDay()))} ${escapeHTML(
+                        `${day.date.getMonth() + 1}/${day.date.getDate()}`
+                    )}
+                            </div>
+                            ${day.items.length
+                                ? day.items
+                                      .map(
+                                          (item) => `
+                                    <div class="calendar-item">
+                                        <strong>${escapeHTML(item.title)}</strong>
+                                        <div>${escapeHTML(item.frequency === "weekly" ? "週刊" : "隔週")}</div>
+                                    </div>`
+                                      )
+                                      .join("")
+                                : `<div class="calendar-item empty">更新なし</div>`}
+                        </div>`;
+                })
+                .join("")}
+        </div>`;
+}
+
 function formatDateToJp(date) {
     const d = new Date(date);
     if (Number.isNaN(d.getTime())) return "未設定";
@@ -266,6 +343,8 @@ async function renderSchedulePage() {
 
     const items = await getScheduleItems();
     const todayItems = items.filter(isItemUpdatingToday);
+
+    renderReadingCalendar(items);
 
     if (todayUpdates) {
         todayUpdates.innerHTML = todayItems.length
