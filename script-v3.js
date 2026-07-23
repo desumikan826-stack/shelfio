@@ -299,7 +299,7 @@ function displayBooks() {
                         </button>
                     </p>
 
-                    <p class="status-wrap">
+                    <div class="status-wrap">
                         読書状況：
                         <button class="status-current" onclick="toggleStatusMenu('${book.id}')">
                             ${book.status === "unread" ? "未読" : book.status === "reading" ? "読書中" : "読了済み"} ▾
@@ -310,7 +310,7 @@ function displayBooks() {
                             <button onclick="changeStatus('${book.id}', 'reading')">読書中</button>
                             <button onclick="changeStatus('${book.id}', 'finished')">読了済み</button>
                         </div>
-                    </p>
+                    </div>
 
                     <button onclick="deleteBook('${book.id}')">削除</button>
                 </div>
@@ -402,7 +402,7 @@ async function changeStatus(bookId, status) {
 function toggleStatusMenu(bookId) {
     const menu = document.getElementById(`statusMenu-${bookId}`);
     if (!menu) return;
-    menu.style.display = menu.style.display === "none" ? "block" : "none";
+    menu.style.display = menu.style.display === "none" ? "flex" : "none";
 }
 window.toggleStatusMenu = toggleStatusMenu;
 
