@@ -430,25 +430,17 @@ async function searchBook() {
     if (keyword === "") return;
 
     const searchBtn = document.getElementById("searchBtn");
-    if (searchBtn) searchBtn.disabled = true; // 検索中は連打できないようにする
+    if (searchBtn) searchBtn.disabled = true;
 
     try {
-        // 楽天とNDLを同時に検索する
-        const [rakutenItems, ndlItems] = await Promise.all([
-            fetchRakutenResults(keyword, searchType),
-            fetchNdlResults(keyword, searchType)
-        ]);
-
-        // 重複を取り除いて1つのリストにまとめる
-        const mergedItems = mergeResults(rakutenItems, ndlItems);
-
-        displaySearchResult(mergedItems);
+        const items = await fetchRakutenResults(keyword, searchType);
+        displaySearchResult(items);
 
     } catch (e) {
         console.error(e);
         alert("検索に失敗しました。少し時間を置いてもう一度お試しください。");
     } finally {
-        if (searchBtn) searchBtn.disabled = false; // 検索が終わったら押せるように戻す
+        if (searchBtn) searchBtn.disabled = false;
     }
 }
 
@@ -478,16 +470,6 @@ async function fetchRakutenResults(keyword, searchType) {
         };
     });
 }
-
-
-// NDL(国立国会図書館)APIの結果を、同じ共通の形に揃えて返す
-async function fetchNdlResults(keyword, searchType) {
-    const indexMap = {
-        title: "title",
-        author: "creator",
-        publisherName: "publisher",
-        isbn: "isbn"
-    };
 
     const index = indexMap[searchType];
 
@@ -538,29 +520,6 @@ async function fetchNdlResults(keyword, searchType) {
     }
 
     return results;
-}
-
-// 同じ本かどうかを判定する（ISBNが一致、またはタイトル＋著者が一致）
-function isSameBook(a, b) {
-    if (a.isbn && b.isbn && a.isbn === b.isbn) return true;
-
-    const normalize = (str) => (str || "").replace(/\s/g, "").toLowerCase();
-    return normalize(a.title) === normalize(b.title) &&
-    normalize(a.author) === normalize(b.author);
-}
-
-// 楽天の結果をベースに、NDLにしかない本だけを追加してまとめる
-function mergeResults(rakutenItems, ndlItems) {
-    const merged = [...rakutenItems];
-
-    ndlItems.forEach((ndlItem) => {
-        const isDuplicate = merged.some((item) => isSameBook(item, ndlItem));
-        if (!isDuplicate) {
-            merged.push(ndlItem);
-        }
-    });
-
-    return merged;
 }
 
 function displaySearchResult(items) {
