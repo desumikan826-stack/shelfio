@@ -444,7 +444,6 @@ async function searchBook() {
     }
 }
 
-
 // 楽天ブックスAPIの結果を、共通の形（title, author, isbnなど）に揃えて返す
 async function fetchRakutenResults(keyword, searchType) {
     const { data, error } = await supabase.functions.invoke("rakuten-search", {
