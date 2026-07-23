@@ -641,10 +641,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
-
         await signOut();
-
         location.href = "login.html";
-
     });
 }
