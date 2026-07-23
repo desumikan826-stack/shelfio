@@ -150,7 +150,6 @@ function setRating(rating) {
 async function addBook() {
     const title = document.getElementById("title").value;
     const author = document.getElementById("author").value;
-    const pages = Number(document.getElementById("pages").value) || 0;
     const purchased = document.getElementById("purchased").checked;
     const status = document.getElementById("status").value;
 
@@ -168,7 +167,7 @@ async function addBook() {
         isbn: "",
         publisher: "publisher",
         publish_date: "",
-        pages: pages,
+        pages: 0,
         rating: currentRating,
         purchased: purchased,
         status: status
@@ -287,7 +286,6 @@ function displayBooks() {
                     <h3>${escapeHTML(book.title)}</h3>
                     <p>著者：${escapeHTML(book.author)}</p>
                     <p>出版社：${escapeHTML(book.publisher || "不明")}</p>
-                    <p>ページ数：${escapeHTML(book.pages || 0)}ページ</p>
                     <p>ISBN：${escapeHTML(book.isbn || "なし")}</p>
 
                     <p>
