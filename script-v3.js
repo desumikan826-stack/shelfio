@@ -527,7 +527,7 @@ async function fetchNdlResults(keyword, searchType) {
             publisherName: publisher,
             salesDate: "",
             itemPrice: "",
-            largeImageUrl: "",
+            largeImageUrl: isbn ? `https://ndlsearch.ndl.go.jp/thumbnail/${isbn}.jpg` : "",
             isbn,
             source: "ndl"
         });
@@ -569,11 +569,11 @@ function displaySearchResult(items) {
         const div = document.createElement("div");
         div.className = "book";
         div.innerHTML = `
-            <img src="${escapeHTML(info.largeImageUrl || "")}">
+            <img src="${escapeHTML(info.largeImageUrl || "")}" onerror="this.style.display='none'">
             <h3>${escapeHTML(info.title)}</h3>
             <p>著者：${escapeHTML(info.author)}</p>
-            <p>発売日：${escapeHTML(info.salesDate || "不明")}</p>
-            <p>価格：${escapeHTML(info.itemPrice || "不明")}円</p>
+            ${info.salesDate ? `<p>発売日：${escapeHTML(info.salesDate)}</p>` : ""}
+            ${info.itemPrice ? `<p>価格：${escapeHTML(info.itemPrice)}円</p>` : ""}
         `;
 
         const button = document.createElement("button");
@@ -584,7 +584,6 @@ function displaySearchResult(items) {
         result.appendChild(div);
     });
 }
-
 function switchTab(tabName) {
     currentTab = tabName; // タブの状態を更新
 
