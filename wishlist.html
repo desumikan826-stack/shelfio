@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ほしい本 - Shelfio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+        📚 Shelfio
+</div>
+
+    <nav>
+        <a href="index.html">🏠 トップへ戻る</a>
+        <a href="search.html">🔍 検索</a>
+        <a href="list.html">📚 本棚</a>
+        <a href="wishlist.html">💖 ほしい本</a>
+        <a href="updates.html">🗓 更新</a>
+        <button id="logoutBtn">ログアウト</button>
+    </nav>
+
+</header>
+
+<main class="container">
+    <h1>ほしい本（Wishlist）</h1>
+
+    <section class="add-wishlist">
+        <h2>手動で追加</h2>
+        <form id="wishlistForm" onsubmit="event.preventDefault(); addWishlistFromForm();">
+            <input id="w-title" placeholder="タイトル" required>
+            <input id="w-author" placeholder="著者">
+            <input id="w-isbn" placeholder="ISBN">
+            <input id="w-image" placeholder="画像URL">
+            <input id="w-price" placeholder="価格">
+            <button type="submit">追加</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>リスト</h2>
+        <div id="wishlistList">読み込み中...</div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script-v3.js" type="module"></script>
+<script>
+// This page re-uses globals and functions from script-v3.js (supabase, currentUser, addWishlistItem, purchaseWishlistItem, deleteWishlistItem)
+
+async function renderWishlistPage() {
+    const container = document.getElementById('wishlistList');
+    container.innerHTML = '読み込み中...';
+
+    try {
+        // Ensure we have currentUser; script-v3.js normally sets this when signed in
+        if (!window.currentUser) {
+            const userRes = await supabase.auth.getUser();
+            window.currentUser = userRes?.data?.user || null;
+        }
+
+        if (!window.currentUser) {
+            container.innerHTML = '<p>ログインしてください。<br><a href="login.html">ログイン / 新規登録</a></p>';
+            return;
+        }
+
+        // Try to use the in-memory wishlists if available, otherwise fetch
+        let items = window.wishlists || [];
+        if (!items || items.length === 0) {
+            // fetch from Supabase table (works even if this page loaded separately)
+            const { data, error } = await supabase
+                .from('wishlists')
+                .select('*')
+                .eq('user_id', window.currentUser.id)
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                console.error('wishlists 読み込みエラー:', error);
+                // show friendly message if table missing
+                if (error?.code === 'PGRST205' || /Could not find the table/.test(error?.message || '')) {
+                    container.innerHTML = '<p>データベースに「wishlists」テーブルが見つかりません。管理コンソールで作成してください。</p>';
+                    return;
+                }
+                container.innerHTML = '<p>読み込み中にエラーが発生しました。コンソールを確認してください。</p>';
+                return;
+            }
+            items = data || [];
+            window.wishlists = items;
+        }
+
+        if (!items || items.length === 0) {
+            container.innerHTML = '<p>ほしい本はまだありません。</p>';
+            return;
+        }
+
+        container.innerHTML = items.map(item => {
+            const title = item.title || '（タイトルなし）';
+            const author = item.author || '';
+            const image = item.image ? `<img src="${item.image}" alt="${title}" class="book-thumb">` : '';
+            const id = item.id;
+            const price = item.price ? ` (${item.price}円)` : '';
+            return `
+                <div class="book-item">
+                    ${image}
+                    <div class="book-info">
+                        <div class="book-title">${escapeHTML(title)}</div>
+                        <div class="book-author">${escapeHTML(author)}${price}</div>
+                        <div class="book-actions">
+                            <button onclick="purchaseWishlistItem('${id}')">購入済みにする</button>
+                            <button onclick="deleteWishlistItem('${id}')">削除</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = '<p>エラーが発生しました。コンソールを確認してください。</p>';
+    }
+}
+
+async function addWishlistFromForm() {
+    const title = document.getElementById('w-title').value.trim();
+    const author = document.getElementById('w-author').value.trim();
+    const isbn = document.getElementById('w-isbn').value.trim();
+    const image = document.getElementById('w-image').value.trim();
+    const price = document.getElementById('w-price').value.trim();
+
+    if (!title) return alert('タイトルを入力してください');
+
+    const book = { title, author, isbn, image, price };
+    try {
+        if (typeof addWishlistItem === 'function') {
+            await addWishlistItem(book);
+        } else {
+            // Fallback: insert directly via supabase
+            await supabase.from('wishlists').insert([{ ...book, user_id: window.currentUser.id }]);
+        }
+        // clear form
+        document.getElementById('wishlistForm').reset();
+        // re-render
+        await renderWishlistPage();
+    } catch (err) {
+        console.error(err);
+        alert('追加中にエラーが発生しました。コンソールを確認してください。');
+    }
+}
+
+window.addEventListener('load', () => {
+    // Delay slightly to allow script-v3.js to initialize auth and load wishlists
+    setTimeout(renderWishlistPage, 400);
+});
+</script>
+
+</body>
+
+</html>
