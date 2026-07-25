@@ -35,6 +35,18 @@ button{
     border-left:5px solid #ff6b9d;
 }
 
+.book.status-unread{
+    border-left:5px solid #ffcc00;
+}
+
+.book.status-reading{
+    border-left:5px solid #4A90E2;
+}
+
+.book.status-finished{
+    border-left:5px solid #34c759;
+}
+
 .book-image{
     width:120px;
     height:auto;

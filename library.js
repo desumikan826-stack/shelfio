@@ -419,7 +419,7 @@ export function displayBooks() {
         const risk = getTsundokuRisk(book);
 
         htmlParts.push(`
-            <div class="book">
+            <div class="book status-${book.status}">
                 <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image" onerror="this.style.display='none'">
 
                 <div class="book-info">
@@ -496,7 +496,7 @@ async function renderBookDetailView() {
     list.innerHTML = `
         <div class="book-detail">
             <button class="small-button" onclick="backToList()">← 一覧に戻る</button>
-            <div class="book">
+            <div class="book status-${book.status}">
                 <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image" onerror="this.style.display='none'">
                 <div class="book-info">
                     <h3>${escapeHTML(book.title)}</h3>
