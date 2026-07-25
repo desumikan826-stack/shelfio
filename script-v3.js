@@ -19,6 +19,7 @@ function escapeHTML(value) {
         "'": "&#39;",
     }[char]));
 }
+window.escapeHTML = escapeHTML;
 
 async function signUp(email,password){
 
@@ -50,6 +51,7 @@ async function signOut(){
 supabase.auth.onAuthStateChange((event, session) => {
 
     currentUser = session?.user ?? null;
+    window.currentUser = currentUser;
 
     console.log(event, currentUser);
 
@@ -64,6 +66,7 @@ async function updateUI() {
     } = await supabase.auth.getSession();
 
     currentUser = session?.user ?? null;
+    window.currentUser = currentUser;
 
     const nav = document.querySelector("nav");
     const message = document.getElementById("welcome-message");
@@ -167,6 +170,7 @@ async function loadBooks() {
         console.warn("wishlists 読み込み例外:", e?.message || e);
         wishlists = [];
     }
+    window.wishlists = wishlists;
 
     displayBooks();
     renderSchedulePage();
