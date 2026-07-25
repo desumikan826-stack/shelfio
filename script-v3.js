@@ -779,21 +779,17 @@ function displayBooks() {
     const keyword = search.value.toLowerCase();
     const sortType = document.getElementById("sortType")?.value || "none";
 
-    // 本の統計を表示（所有 + ほしい本）
+    // 本の統計を表示（所有本のみ）
     if (stats) {
-        const totalOwned = books.length;
-        const totalWish = wishlists.length;
-        const total = totalOwned + totalWish;
         const unread = books.filter(book => book.status === "unread").length;
         const reading = books.filter(book => book.status === "reading").length;
         const finished = books.filter(book => book.status === "finished").length;
 
-        const rate = totalOwned === 0 ? 0 : Math.round(finished / totalOwned * 100);
+        const rate = books.length === 0 ? 0 : Math.round(finished / books.length * 100);
         const monthlyChange = getMonthlyTsundokuChange(books);
         const monthlyChangeLabel = monthlyChange > 0 ? `+${monthlyChange}` : `${monthlyChange}`;
 
         stats.innerHTML = `
-        📚 総数（所有＋ほしい）：${total}冊　（所有：${totalOwned} / ほしい：${totalWish}）
         📖 未読（所有）：${unread}冊　
         📘 読書中（所有）：${reading}冊　
         ✅ 読了（所有）：${finished}冊　
@@ -822,8 +818,8 @@ function displayBooks() {
 
     const htmlParts = [];
 
-    // まず「ほしい本」を表示（タブが all か want のとき）
-    if (currentTab === "all" || currentTab === "want") {
+    // 「ほしい本」を表示（タブが want のときだけ）
+    if (currentTab === "want") {
         sortedWishlists.forEach((w) => {
             const matchesKeyword = (w.title || "").toLowerCase().includes(keyword) || (w.author || "").toLowerCase().includes(keyword);
             if (!matchesKeyword) return;
