@@ -463,3 +463,20 @@ nav a:hover{
     line-height: 1.6;
     white-space: pre-wrap;
 }
+
+.stats-section {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .15);
+    margin-bottom: 24px;
+}
+
+.stats-section h3 {
+    margin-top: 0;
+}
+
+.chart-wrap {
+    max-width: 480px;
+    margin: 0 auto;
+}

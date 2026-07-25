@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>統計 - Shelfio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head>
+
+<body>
+
+<header>
+<div class="logo">
+        📚 Shelfio
+</div>
+
+    <nav>
+        <a href="index.html">🏠 トップへ戻る</a>
+        <a href="search.html">🔍 検索</a>
+        <a href="list.html">📚 本棚</a>
+        <a href="wishlist.html">💖 ほしい本</a>
+        <a href="updates.html">🗓 更新</a>
+        <a href="stats.html">📊 統計</a>
+        <button id="logoutBtn">ログアウト</button>
+    </nav>
+</header>
+
+<main>
+    <h2>統計</h2>
+
+    <section class="stats-section">
+        <h3>読書状況の内訳</h3>
+        <div class="chart-wrap">
+            <canvas id="statusPieChart"></canvas>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <h3>積読増減の推移（直近6か月）</h3>
+        <div class="chart-wrap">
+            <canvas id="tsundokuLineChart"></canvas>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script-v3.js" type="module"></script>
+
+</body>
+
+</html>
