@@ -758,7 +758,7 @@ async function purchaseWishlistItem(wishId) {
     await loadBooks();
 }
 
-function displayBooks() {
+function displayBooks_old() {
     const list = document.getElementById("bookList");
     const search = document.getElementById("search");
     const stats = document.getElementById("bookStats");
