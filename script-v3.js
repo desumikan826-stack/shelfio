@@ -758,127 +758,6 @@ async function purchaseWishlistItem(wishId) {
     await loadBooks();
 }
 
-function displayBooks_old() {
-    const list = document.getElementById("bookList");
-    const search = document.getElementById("search");
-    const stats = document.getElementById("bookStats");
-
-    if (!list) return;
-
-    if (detailBookId) {
-        renderBookDetailView();
-        return;
-    }
-
-    if (!search) return;
-
-    const keyword = search.value.toLowerCase();
-    const sortType = document.getElementById("sortType")?.value || "none";
-
-    // 本の統計を表示
-    if (stats) {
-        const total = books.length;
-        const unread = books.filter(book => book.status === "unread").length;
-        const reading = books.filter(book => book.status === "reading").length;
-        const finished = books.filter(book => book.status === "finished").length;
-
-        const rate = total === 0 ? 0 : Math.round(finished / total * 100);
-        const monthlyChange = getMonthlyTsundokuChange(books);
-        const monthlyChangeLabel = monthlyChange > 0 ? `+${monthlyChange}` : `${monthlyChange}`;
-
-        stats.innerHTML = `
-        📚 総数：${total}冊　
-        📖 未読：${unread}冊　
-        📘 読書中：${reading}冊　
-        ✅ 読了：${finished}冊　
-        📊 読了率：${rate}%　
-        📦 積読増減(今月)：${monthlyChangeLabel}冊
-        `;
-    }
-
-    list.innerHTML = "";
-
-    let sortedBooks = [...books];
-
-    if (sortType === "rating") {
-        sortedBooks.sort((a, b) => b.rating - a.rating);
-    }
-
-    if (sortType === "title") {
-        sortedBooks.sort((a, b) => a.title.localeCompare(b.title, "ja"));
-    }
-
-    // 💡 ループ中に何度もinnerHTML+=すると描画のたびに再計算が走るため、
-    // 一旦配列にHTML文字列をためて最後にまとめて書き込む
-    const htmlParts = [];
-
-    sortedBooks.forEach((book) => {
-
-    const matchesKeyword =
-        book.title.toLowerCase().includes(keyword) ||
-        book.author.toLowerCase().includes(keyword);
-
-    const matchesTab =
-        currentTab === "all" || book.status === currentTab;
-
-    if (matchesKeyword && matchesTab) {
-
-        const risk = getTsundokuRisk(book);
-
-        htmlParts.push(`
-            <div class="book">
-                <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image">
-
-                <div class="book-info">
-                    <h3 class="book-title-link" onclick="showBookDetail('${book.id}')">${escapeHTML(book.title)}</h3>
-                    <p>著者：${escapeHTML(book.author)}</p>
-                    <p>出版社：${escapeHTML(book.publisher || "不明")}</p>
-                    <p>ISBN：${escapeHTML(book.isbn || "なし")}</p>
-                    ${book.price ? `<p>価格：${escapeHTML(book.price)}円</p>` : ""}
-                    ${risk ? `<p><span class="risk-dot ${risk.color}" title="登録から${risk.days}日"></span>積読${risk.days}日目</p>` : ""}
-
-                    <p>
-                        評価：
-                        ${book.rating === 0 ? "<span class='no-rating'>未評価</span>" : ""}
-                        ${[1,2,3,4,5].map(star => `
-                            <span onclick="changeRating('${book.id}', ${star})" class="star">
-                                ${star <= book.rating ? "★" : "☆"}
-                            </span>
-                        `).join("")}
-                    </p>
-
-                    <p>
-                        購入：${book.purchased ? "購入済み" : "未購入"}
-                        <button onclick="togglePurchased('${book.id}')">
-                            ${book.purchased ? "未購入に戻す" : "購入済みにする"}
-                        </button>
-                    </p>
-
-                    <p class="status-wrap">
-                        読書状況：
-                        <button class="status-current" onclick="toggleStatusMenu('${book.id}')">
-                            ${book.status === "unread" ? "未読" : book.status === "reading" ? "読書中" : "読了済み"} ▾
-                        </button>
-
-                        <span id="statusMenu-${book.id}" class="status-menu" style="display:none;">
-                            <button onclick="changeStatus('${book.id}', 'unread')">未読</button>
-                            <button onclick="changeStatus('${book.id}', 'reading')">読書中</button>
-                            <button onclick="changeStatus('${book.id}', 'finished')">読了済み</button>
-                        </span>
-                    </p>
-
-                    <button onclick="deleteBook('${book.id}')">削除</button>
-                </div>
-            </div>
-        `);
-
-    }
-
-});
-
-    list.innerHTML = htmlParts.join("");
-}
-
 function displayBooks() {
     const list = document.getElementById("bookList");
     const search = document.getElementById("search");
@@ -947,7 +826,7 @@ function displayBooks() {
 
             htmlParts.push(`
                 <div class="book wishlist">
-                    <img src="${escapeHTML(w.image || "")}" alt="表紙" class="book-image">
+                    <img src="${escapeHTML(w.image || "")}" alt="表紙" class="book-image" onerror="this.style.display='none'">
                     <div class="book-info">
                         <h3>${escapeHTML(w.title)}</h3>
                         <p>著者：${escapeHTML(w.author)}</p>
@@ -979,7 +858,7 @@ function displayBooks() {
 
         htmlParts.push(`
             <div class="book">
-                <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image">
+                <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image" onerror="this.style.display='none'">
 
                 <div class="book-info">
                     <h3 class="book-title-link" onclick="showBookDetail('${book.id}')">${escapeHTML(book.title)}</h3>
@@ -1078,7 +957,7 @@ async function renderBookDetailView() {
         <div class="book-detail">
             <button class="small-button" onclick="backToList()">← 一覧に戻る</button>
             <div class="book">
-                <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image">
+                <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image" onerror="this.style.display='none'">
                 <div class="book-info">
                     <h3>${escapeHTML(book.title)}</h3>
                     <p>著者：${escapeHTML(book.author)}</p>
@@ -1402,7 +1281,7 @@ if(signupBtn){
         (
             page === "list.html" ||
             page === "search.html" ||
-            page === "settings.html" ||
+            page === "wishlist.html" ||
             page === "updates.html"
         )
     ) {
