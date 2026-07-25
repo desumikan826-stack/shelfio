@@ -1023,7 +1023,7 @@ function displayBooks() {
             </div>
         `);
     });
-n    list.innerHTML = htmlParts.join("");
+    list.innerHTML = htmlParts.join("");
 }
 
 function showBookDetail(bookId) {
