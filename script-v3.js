@@ -100,7 +100,8 @@ async function updateUI() {
 
 updateUI();
 
-let books = [];
+let books = []; // 所有/購入済みの本（books テーブル）
+let wishlists = []; // ほしい本（wishlists テーブル）
 // 検索結果のページング用
 let allSearchResults = [];
 let currentSearchPage = 1;
@@ -125,19 +126,48 @@ async function loadBooks() {
 
     if (!user) return;
 
-    const { data, error } = await supabase
+    // ワンタイム移行処理（未購入の本を books から wishlists に移動）
+    try {
+        await runOneTimeMigration();
+    } catch (e) {
+        // 移行に失敗しても続行する（wishlists テーブルが無い等）
+        console.warn("runOneTimeMigration error:", e?.message || e);
+    }
+
+    // 所有/購入済みの本を取得
+    const { data: booksData, error: booksError } = await supabase
         .from("books")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: true });
 
-    if (error) {
-        console.error(error);
+    if (booksError) {
+        console.error(booksError);
         alert("本の一覧の取得に失敗しました。もう一度お試しください。");
         return;
     }
 
-    books = data || [];
+    books = booksData || [];
+
+    // ほしい本（wishlists）が存在すれば取得（テーブルが無ければ空配列）
+    try {
+        const { data: wishlistData, error: wishlistError } = await supabase
+            .from("wishlists")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: true });
+
+        if (wishlistError) {
+            console.warn("wishlists 読み込みエラー:", wishlistError);
+            wishlists = [];
+        } else {
+            wishlists = wishlistData || [];
+        }
+    } catch (e) {
+        console.warn("wishlists 読み込み例外:", e?.message || e);
+        wishlists = [];
+    }
+
     displayBooks();
     renderSchedulePage();
 }
@@ -432,7 +462,7 @@ function handleExistingBookChange() {
         authorInput.value = "";
         return;
     }
-    const book = books.find((item) => String(item.id) === String(bookId));
+    const book = [...books, ...wishlists].find((item) => String(item.id) === String(bookId));
     if (book) {
         titleInput.value = book.title;
         authorInput.value = book.author;
@@ -504,28 +534,54 @@ async function addBook() {
     if (title === "") return;
 
     const user = await getCurrentUser();
+    if (!user) return;
 
-    const { error } = await supabase
-        .from("books")
-        .insert({
-        user_id: user.id,
-        title: title,
-        author: author,
-        image: "",
-        isbn: "",
-        publisher: "publisher",
-        publish_date: "",
-        pages: 0,
-        price: price,
-        rating: currentRating,
-        purchased: purchased,
-        status: status
-    });
+    if (purchased) {
+        // 購入済みとして books テーブルに登録
+        const { error } = await supabase
+            .from("books")
+            .insert({
+                user_id: user.id,
+                title: title,
+                author: author,
+                image: "",
+                isbn: "",
+                publisher: "publisher",
+                publish_date: "",
+                pages: 0,
+                price: price,
+                rating: currentRating,
+                purchased: true,
+                status: status
+            });
 
-    if (error) {
-        console.error(error);
-        alert("本の登録に失敗しました。もう一度お試しください。");
-        return;
+        if (error) {
+            console.error(error);
+            alert("本の登録に失敗しました。もう一度お試しください。");
+            return;
+        }
+    } else {
+        // 未購入（ほしい本）は wishlists テーブルに登録
+        const { error } = await supabase
+            .from("wishlists")
+            .insert({
+                user_id: user.id,
+                title: title,
+                author: author,
+                image: "",
+                isbn: "",
+                publisher: "publisher",
+                publish_date: "",
+                pages: 0,
+                price: price,
+                rating: currentRating
+            });
+
+        if (error) {
+            console.error(error);
+            alert("ほしい本の登録に失敗しました。もう一度お試しください。");
+            return;
+        }
     }
 
     await loadBooks();
@@ -547,7 +603,7 @@ async function addRakutenBook(info) {
     const user = await getCurrentUser();
 
     const { data, error } = await supabase
-        .from("books")
+        .from("wishlists")
         .insert({
         user_id: user.id,
         title: info.title,
@@ -558,9 +614,7 @@ async function addRakutenBook(info) {
         publish_date: info.salesDate || "",
         pages: 0,
         price: Number(info.itemPrice) || 0,
-        rating: 0,
-        purchased: false,
-        status: "unread"
+        rating: 0
     });
 
     if (error) {
@@ -572,6 +626,136 @@ async function addRakutenBook(info) {
     await loadBooks();
 
     alert("登録しました");
+}
+
+// ---- Wishlist / migration utilities ----
+async function runOneTimeMigration() {
+    const user = await getCurrentUser();
+    if (!user) return;
+
+    // 簡易チェック: wishlists テーブルに既にデータがあれば移行済みとみなす
+    try {
+        const { data: existing, error: existsError } = await supabase.from("wishlists").select("id").eq("user_id", user.id).limit(1);
+        if (existsError) {
+            // テーブルが存在しない等のエラーは無視して終了
+            console.warn("wishlists チェックエラー: ", existsError.message || existsError);
+            return;
+        }
+        if (existing && existing.length) return; // すでに何かあれば移行不要
+    } catch (e) {
+        console.warn("wishlists チェック例外: ", e?.message || e);
+        return;
+    }
+
+    // 未購入の本を取得して wishlists に移動する
+    try {
+        const { data: unpurchased, error } = await supabase.from("books").select("*").eq("user_id", user.id).eq("purchased", false);
+        if (error) {
+            console.warn("未購入取得エラー:", error);
+            return;
+        }
+
+        if (!unpurchased || !unpurchased.length) return;
+
+        for (const item of unpurchased) {
+            const insertObj = {
+                user_id: user.id,
+                title: item.title,
+                author: item.author,
+                image: item.image || "",
+                isbn: item.isbn || "",
+                publisher: item.publisher || "",
+                publish_date: item.publish_date || "",
+                pages: item.pages || 0,
+                price: item.price || 0,
+                rating: item.rating || 0,
+                created_at: item.created_at || new Date().toISOString()
+            };
+
+            const { error: insertErr } = await supabase.from("wishlists").insert(insertObj);
+            if (insertErr) {
+                console.error("wishlists への挿入に失敗:", insertErr);
+                continue;
+            }
+
+            const { error: delErr } = await supabase.from("books").delete().eq("id", item.id);
+            if (delErr) console.error("books の削除に失敗:", delErr);
+        }
+    } catch (e) {
+        console.error("移行処理で例外が発生しました:", e?.message || e);
+    }
+}
+
+async function addWishlistItem({ title, author, image = "", isbn = "", publisher = "", publish_date = "", pages = 0, price = 0, rating = 0 }) {
+    const user = await getCurrentUser();
+    if (!user) return;
+
+    const { error } = await supabase.from("wishlists").insert({
+        user_id: user.id,
+        title,
+        author,
+        image,
+        isbn,
+        publisher,
+        publish_date,
+        pages,
+        price,
+        rating
+    });
+
+    if (error) {
+        console.error(error);
+        alert("ほしい本の登録に失敗しました。もう一度お試しください。");
+        return;
+    }
+
+    await loadBooks();
+    alert("ほしい本として登録しました");
+}
+
+async function deleteWishlistItem(wishId) {
+    const { error } = await supabase.from("wishlists").delete().eq("id", wishId);
+    if (error) {
+        console.error(error);
+        alert("ほしい本の削除に失敗しました。もう一度お試しください。");
+        return;
+    }
+    await loadBooks();
+}
+
+async function purchaseWishlistItem(wishId) {
+    const item = wishlists.find(w => String(w.id) === String(wishId));
+    if (!item) return;
+
+    const user = await getCurrentUser();
+    if (!user) return;
+
+    const insertObj = {
+        user_id: user.id,
+        title: item.title,
+        author: item.author,
+        image: item.image || "",
+        isbn: item.isbn || "",
+        publisher: item.publisher || "",
+        publish_date: item.publish_date || "",
+        pages: item.pages || 0,
+        price: item.price || 0,
+        rating: item.rating || 0,
+        purchased: true,
+        status: "unread"
+    };
+
+    const { error: insertErr } = await supabase.from("books").insert(insertObj);
+    if (insertErr) {
+        console.error(insertErr);
+        alert("購入済みにする操作に失敗しました。もう一度お試しください。");
+        return;
+    }
+
+    const { error: delErr } = await supabase.from("wishlists").delete().eq("id", wishId);
+    if (delErr) console.error("wishlists 削除エラー:", delErr);
+
+    await loadBooks();
 }
 
 function displayBooks() {
@@ -693,6 +877,153 @@ function displayBooks() {
 });
 
     list.innerHTML = htmlParts.join("");
+}
+
+function displayBooks() {
+    const list = document.getElementById("bookList");
+    const search = document.getElementById("search");
+    const stats = document.getElementById("bookStats");
+
+    if (!list) return;
+
+    if (detailBookId) {
+        renderBookDetailView();
+        return;
+    }
+
+    if (!search) return;
+
+    const keyword = search.value.toLowerCase();
+    const sortType = document.getElementById("sortType")?.value || "none";
+
+    // 本の統計を表示（所有 + ほしい本）
+    if (stats) {
+        const totalOwned = books.length;
+        const totalWish = wishlists.length;
+        const total = totalOwned + totalWish;
+        const unread = books.filter(book => book.status === "unread").length;
+        const reading = books.filter(book => book.status === "reading").length;
+        const finished = books.filter(book => book.status === "finished").length;
+
+        const rate = totalOwned === 0 ? 0 : Math.round(finished / totalOwned * 100);
+        const monthlyChange = getMonthlyTsundokuChange(books);
+        const monthlyChangeLabel = monthlyChange > 0 ? `+${monthlyChange}` : `${monthlyChange}`;
+
+        stats.innerHTML = `
+        📚 総数（所有＋ほしい）：${total}冊　（所有：${totalOwned} / ほしい：${totalWish}）
+        📖 未読（所有）：${unread}冊　
+        📘 読書中（所有）：${reading}冊　
+        ✅ 読了（所有）：${finished}冊　
+        📊 読了率（所有）：${rate}%　
+        📦 積読増減(今月)：${monthlyChangeLabel}冊
+        `;
+    }
+
+    list.innerHTML = "";
+
+    // 所有本はソート処理を行う（ほしい本は単純にタイトル順）
+    let sortedBooks = [...books];
+
+    if (sortType === "rating") {
+        sortedBooks.sort((a, b) => b.rating - a.rating);
+    }
+
+    if (sortType === "title") {
+        sortedBooks.sort((a, b) => a.title.localeCompare(b.title, "ja"));
+    }
+
+    const sortedWishlists = [...wishlists];
+    if (sortType === "title") {
+        sortedWishlists.sort((a, b) => a.title.localeCompare(b.title, "ja"));
+    }
+
+    const htmlParts = [];
+
+    // まず「ほしい本」を表示（タブが all か want のとき）
+    if (currentTab === "all" || currentTab === "want") {
+        sortedWishlists.forEach((w) => {
+            const matchesKeyword = (w.title || "").toLowerCase().includes(keyword) || (w.author || "").toLowerCase().includes(keyword);
+            if (!matchesKeyword) return;
+
+            htmlParts.push(`
+                <div class="book wishlist">
+                    <img src="${escapeHTML(w.image || "")}" alt="表紙" class="book-image">
+                    <div class="book-info">
+                        <h3>${escapeHTML(w.title)}</h3>
+                        <p>著者：${escapeHTML(w.author)}</p>
+                        <p>出版社：${escapeHTML(w.publisher || "不明")}</p>
+                        <p>ISBN：${escapeHTML(w.isbn || "なし")}</p>
+                        ${w.price ? `<p>価格：${escapeHTML(w.price)}円</p>` : ""}
+
+                        <p>
+                            <button onclick="purchaseWishlistItem('${w.id}')">購入済みにする</button>
+                            <button onclick="deleteWishlistItem('${w.id}')">削除</button>
+                        </p>
+                    </div>
+                </div>
+            `);
+        });
+    }
+
+    // 次に所有本を表示（タブが all または ステータスタブのとき）
+    sortedBooks.forEach((book) => {
+        const matchesKeyword =
+            (book.title || "").toLowerCase().includes(keyword) ||
+            (book.author || "").toLowerCase().includes(keyword);
+
+        const matchesTab =
+            currentTab === "all" || book.status === currentTab;
+
+        if (!(matchesKeyword && matchesTab)) return;
+        const risk = getTsundokuRisk(book);
+        htmlParts.push(`
+            <div class="book">
+                <img src="${escapeHTML(book.image || "")}" alt="表紙" class="book-image">
+
+                <div class="book-info">
+                    <h3 class="book-title-link" onclick="showBookDetail('${book.id}')">${escapeHTML(book.title)}</h3>
+                    <p>著者：${escapeHTML(book.author)}</p>
+                    <p>出版社：${escapeHTML(book.publisher || "不明")}</p>
+                    <p>ISBN：${escapeHTML(book.isbn || "なし")}</p>
+                    ${book.price ? `<p>価格：${escapeHTML(book.price)}円</p>` : ""}
+                    ${risk ? `<p><span class="risk-dot ${risk.color}" title="登録から${risk.days}日"></span>積読${risk.days}日目</p>` : ""}
+
+                    <p>
+                        評価：
+                        ${book.rating === 0 ? "<span class='no-rating'>未評価</span>" : ""}
+                        ${[1,2,3,4,5].map(star => `
+                            <span onclick="changeRating('${book.id}', ${star})" class="star">
+                                ${star <= book.rating ? "★" : "☆"}
+                            </span>
+                        `).join("")}
+                    </p>
+
+                    <p>
+                        購入：${book.purchased ? "購入済み" : "未購入"}
+                        <button onclick="togglePurchased('${book.id}')">
+                            ${book.purchased ? "未購入に戻す" : "購入済みにする"}
+                        </button>
+                    </p>
+
+                    <p class="status-wrap">
+                        読書状況：
+                        <button class="status-current" onclick="toggleStatusMenu('${book.id}')">
+                            ${book.status === "unread" ? "未読" : book.status === "reading" ? "読書中" : "読了済み"} ▾
+                        </button>
+
+                        <span id="statusMenu-${book.id}" class="status-menu" style="display:none;">
+                            <button onclick="changeStatus('${book.id}', 'unread')">未読</button>
+                            <button onclick="changeStatus('${book.id}', 'reading')">読書中</button>
+                            <button onclick="changeStatus('${book.id}', 'finished')">読了済み</button>
+                        </span>
+                    </p>
+
+                    <button onclick="deleteBook('${book.id}')">削除</button>
+                </div>
+            </div>
+        `);
+    });
+n    list.innerHTML = htmlParts.join("");
 }
 
 function showBookDetail(bookId) {
@@ -1093,6 +1424,10 @@ window.deleteScheduleItem = deleteScheduleItem;
 window.handleExistingBookChange = handleExistingBookChange;
 window.handleFrequencyChange = handleFrequencyChange;
 window.renderSchedulePage = renderSchedulePage;
+// Wishlists 外部公開
+window.purchaseWishlistItem = purchaseWishlistItem;
+window.deleteWishlistItem = deleteWishlistItem;
+window.addWishlistItem = addWishlistItem;
 
 const logoutBtn = document.getElementById("logoutBtn");
 
