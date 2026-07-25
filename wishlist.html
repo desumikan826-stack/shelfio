@@ -52,16 +52,16 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script-v3.js" type="module"></script>
+<script src="main.js" type="module"></script>
 <script>
-// This page re-uses globals and functions from script-v3.js (supabase, currentUser, addWishlistItem, purchaseWishlistItem, deleteWishlistItem)
+// This page re-uses globals and functions from main.js (supabase, currentUser, addWishlistItem, purchaseWishlistItem, deleteWishlistItem)
 
 async function renderWishlistPage() {
     const container = document.getElementById('wishlistList');
     container.innerHTML = '読み込み中...';
 
     try {
-        // Ensure we have currentUser; script-v3.js normally sets this when signed in
+        // Ensure we have currentUser; main.js normally sets this when signed in
         if (!window.currentUser) {
             const userRes = await window.globalSupabase.auth.getUser();
             window.currentUser = userRes?.data?.user || null;
@@ -156,7 +156,7 @@ async function addWishlistFromForm() {
 }
 
 window.addEventListener('load', () => {
-    // Delay slightly to allow script-v3.js to initialize auth and load wishlists
+    // Delay slightly to allow main.js to initialize auth and load wishlists
     setTimeout(renderWishlistPage, 400);
 });
 </script>
