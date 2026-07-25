@@ -19,15 +19,21 @@
 </div>
 
     <nav>
-        <a href="index.html">🏠 トップへ戻る</a>
         <a href="search.html">🔍 検索</a>
         <a href="list.html">📚 本棚</a>
         <a href="wishlist.html">💖 ほしい本</a>
-        <a href="updates.html">🗓 更新</a>
-        <a href="stats.html">📊 統計</a>
-        <button id="logoutBtn">ログアウト</button>
+        <button id="menuToggleBtn" class="hamburger-btn">☰ その他</button>
     </nav>
 </header>
+
+<div id="sideMenuOverlay" class="side-menu-overlay"></div>
+<aside id="sideMenu" class="side-menu">
+    <button id="sideMenuClose" class="side-menu-close" aria-label="閉じる">&times;</button>
+    <a href="index.html">🏠 トップへ戻る</a>
+    <a href="updates.html">🗓 更新</a>
+    <a href="stats.html">📊 統計</a>
+    <button id="logoutBtn">ログアウト</button>
+</aside>
 
     <main>
         <h2>更新スケジュール</h2>

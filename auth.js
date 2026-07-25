@@ -160,6 +160,7 @@ export function initLogout() {
 
     if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
+            if (!confirm("ログアウトしますか？")) return;
             await signOut();
             location.href = "login.html";
         });

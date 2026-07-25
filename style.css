@@ -480,3 +480,97 @@ nav a:hover{
     max-width: 480px;
     margin: 0 auto;
 }
+
+/* ハンバーガーメニュー（その他） */
+.hamburger-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.hamburger-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.side-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1500;
+    opacity: 0;
+    transition: opacity .25s ease;
+}
+
+.side-menu-overlay.visible {
+    display: block;
+    opacity: 1;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 260px;
+    max-width: 80vw;
+    height: 100%;
+    background: white;
+    z-index: 2000;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, .2);
+    padding: 60px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
+    transition: right .25s ease;
+}
+
+.side-menu.open {
+    right: 0;
+}
+
+.side-menu a,
+.side-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 8px;
+    color: #333;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    background: #f5f7fa;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.side-menu a:hover,
+.side-menu button:hover {
+    background: #e9edf2;
+}
+
+.side-menu-close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    background: none;
+    font-size: 26px;
+    color: #333;
+    padding: 0;
+    width: auto;
+}
+
+.side-menu-close:hover {
+    background: none;
+    color: #4A90E2;
+}
