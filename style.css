@@ -543,6 +543,7 @@ nav a:hover{
     flex-direction: column;
     gap: 8px;
     box-sizing: border-box;
+    overflow: hidden;
     transition: right .25s ease;
 }
 
@@ -551,7 +552,7 @@ nav a:hover{
 }
 
 .side-menu a,
-.side-menu button {
+.side-menu button:not(.side-menu-close) {
     display: block;
     width: 100%;
     text-align: left;
@@ -568,22 +569,32 @@ nav a:hover{
 }
 
 .side-menu a:hover,
-.side-menu button:hover {
+.side-menu button:not(.side-menu-close):hover {
     background: #e9edf2;
 }
 
 .side-menu-close {
     position: absolute;
-    top: 12px;
-    right: 15px;
-    background: none;
-    font-size: 26px;
-    color: #333;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-width: 0;
     padding: 0;
-    width: auto;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+    cursor: pointer;
+    box-sizing: border-box;
 }
 
 .side-menu-close:hover {
-    background: none;
+    background: #f0f0f0;
     color: #4A90E2;
 }

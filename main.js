@@ -11,6 +11,10 @@ import {
     displayBooks,
     showBookDetail,
     backToList,
+    renderWishlistPage,
+    showWishlistDetail,
+    backToWishlist,
+    addWishlistFromForm,
     changeRating,
     deleteBook,
     togglePurchased,
@@ -49,6 +53,10 @@ window.renderStatsPage = renderStatsPage;
 window.toggleStatusMenu = toggleStatusMenu;
 window.showBookDetail = showBookDetail;
 window.backToList = backToList;
+window.renderWishlistPage = renderWishlistPage;
+window.showWishlistDetail = showWishlistDetail;
+window.backToWishlist = backToWishlist;
+window.addWishlistFromForm = addWishlistFromForm;
 
 // Wishlists 外部公開
 window.purchaseWishlistItem = purchaseWishlistItem;

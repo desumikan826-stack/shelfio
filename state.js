@@ -12,6 +12,7 @@ export const RESULTS_PER_PAGE = 10;
 
 export let currentTab = 'all'; // 💡 今どのタブが選ばれているかを保存（all, want, read）
 export let detailBookId = null; // 💡 タップして詳細表示している本のID（nullなら一覧表示）
+export let detailWishlistId = null; // 💡 ほしい本ページで詳細表示しているID
 
 export let currentRating = 0;
 
@@ -30,6 +31,10 @@ export function setCurrentTab(tab) {
 
 export function setDetailBookId(id) {
     detailBookId = id;
+}
+
+export function setDetailWishlistId(id) {
+    detailWishlistId = id;
 }
 
 export function setCurrentRating(rating) {
