@@ -1,6 +1,5 @@
 import { escapeHTML, getCurrentUser } from './supabaseClient.js';
 import { books, wishlists } from './state.js';
-import { getReleaseInfo, isReleasingOnDate } from './releaseDate.js';
 
 export const WEEKDAYS = [
     { value: "0", label: "日曜日" },
@@ -104,25 +103,6 @@ function isItemUpdatingOnDate(item, date) {
     return weekDelta % 2 === 0;
 }
 
-function getAllLibraryItems() {
-    return [...books, ...wishlists];
-}
-
-function getReleasesOnDate(date) {
-    return getAllLibraryItems()
-        .map((item) => {
-            if (!isReleasingOnDate(item.publish_date, date)) return null;
-            const info = getReleaseInfo(item.publish_date);
-            if (!info) return null;
-            return { item, info };
-        })
-        .filter(Boolean);
-}
-
-function getReleasesToday() {
-    return getReleasesOnDate(new Date());
-}
-
 function renderReadingCalendar(items) {
     const calendarContainer = document.getElementById("readingCalendar");
     if (!calendarContainer) return;
@@ -132,11 +112,9 @@ function renderReadingCalendar(items) {
         const date = new Date(weekStart);
         date.setDate(date.getDate() + index);
         const dayItems = items.filter((item) => isItemUpdatingOnDate(item, new Date(date)));
-        const releaseItems = getReleasesOnDate(date);
         return {
             date,
             items: dayItems,
-            releaseItems,
         };
     });
 
@@ -145,7 +123,6 @@ function renderReadingCalendar(items) {
             ${days
                 .map((day) => {
                     const todayClass = day.date.toDateString() === new Date().toDateString() ? " today" : "";
-                    const hasContent = day.items.length || day.releaseItems.length;
                     return `
                         <div class="calendar-day${todayClass}">
                             <div class="calendar-day-label">
@@ -153,15 +130,6 @@ function renderReadingCalendar(items) {
                         `${day.date.getMonth() + 1}/${day.date.getDate()}`
                     )}
                             </div>
-                            ${day.releaseItems
-                                .map(
-                                    ({ item, info }) => `
-                                    <div class="calendar-item release${info.isToday ? " release-today" : ""}">
-                                        <strong>${escapeHTML(item.title)}</strong>
-                                        <div>${info.isToday ? "今日発売!!" : `あと${info.daysUntil}日で発売`}</div>
-                                    </div>`
-                                )
-                                .join("")}
                             ${day.items.length
                                 ? day.items
                                       .map(
@@ -172,9 +140,7 @@ function renderReadingCalendar(items) {
                                     </div>`
                                       )
                                       .join("")
-                                : !hasContent
-                                  ? `<div class="calendar-item empty">更新なし</div>`
-                                  : ""}
+                                : `<div class="calendar-item empty">更新なし</div>`}
                         </div>`;
                 })
                 .join("")}
@@ -235,33 +201,20 @@ export async function renderSchedulePage() {
 
     const items = await getScheduleItems();
     const todayItems = items.filter(isItemUpdatingToday);
-    const todayReleases = getReleasesToday();
 
     renderReadingCalendar(items);
 
     if (todayUpdates) {
-        const scheduleHtml = todayItems.map((item) => `
+        todayUpdates.innerHTML = todayItems.length
+            ? todayItems.map((item) => `
                 <div class="schedule-card">
                     <strong>${escapeHTML(item.title)}</strong>
                     <p>${escapeHTML(item.author)}</p>
                     <p>${getWeekdayLabel(item.weekday)}・${item.frequency === "weekly" ? "週刊" : "隔週"}</p>
                     ${item.link ? `<p><a href="${escapeHTML(item.link)}" target="_blank" rel="noopener">作品ページに移動</a></p>` : ""}
                 </div>
-            `).join("");
-
-        const releaseHtml = todayReleases.map(({ item }) => `
-                <div class="schedule-card release-today-card">
-                    <strong>${escapeHTML(item.title)}</strong>
-                    <p>${escapeHTML(item.author || "")}</p>
-                    <p class="release-badge today">今日発売!!</p>
-                </div>
-            `).join("");
-
-        if (!scheduleHtml && !releaseHtml) {
-            todayUpdates.innerHTML = "<p>今日更新の作品はまだありません。</p>";
-        } else {
-            todayUpdates.innerHTML = `${releaseHtml}${scheduleHtml}`;
-        }
+            `).join("")
+            : "<p>今日更新の作品はまだありません。</p>";
     }
 
     if (scheduleList) {
@@ -274,7 +227,7 @@ export async function renderSchedulePage() {
             <div class="schedule-card">
                 <div class="schedule-card-header">
                     <strong>${escapeHTML(item.title)}</strong>
-                    <button class="small-button" onclick="deleteScheduleItem('${item.id}')">削除</button>
+                    <button class="btn btn-danger" onclick="deleteScheduleItem('${item.id}')">削除</button>
                 </div>
                 <p>${escapeHTML(item.author)}</p>
                 <p>更新頻度：${item.frequency === "weekly" ? "週刊" : "隔週"}</p>

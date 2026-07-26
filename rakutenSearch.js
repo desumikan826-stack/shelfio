@@ -71,7 +71,6 @@ export async function fetchRakutenBookByIsbn(isbn) {
     return {
         itemCaption: item.itemCaption || "",
         itemPrice: item.itemPrice || "",
-        salesDate: item.salesDate || "",
     };
 }
 
@@ -124,6 +123,7 @@ export function renderSearchPage() {
         `;
 
         const button = document.createElement("button");
+        button.className = "btn btn-primary";
         button.textContent = "登録";
         button.onclick = () => addRakutenBook(info);
 
@@ -142,6 +142,7 @@ function renderPagination() {
     pagerDiv.className = "pagination";
 
     const prevBtn = document.createElement("button");
+    prevBtn.className = "btn btn-secondary";
     prevBtn.textContent = "← 前へ";
     prevBtn.disabled = currentSearchPage === 1;
     prevBtn.onclick = () => {
@@ -153,6 +154,7 @@ function renderPagination() {
     pageLabel.textContent = `${currentSearchPage} / ${totalPages} ページ`;
 
     const nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-secondary";
     nextBtn.textContent = "次へ →";
     nextBtn.disabled = currentSearchPage === totalPages;
     nextBtn.onclick = () => {

@@ -16,6 +16,65 @@ input{
 
 button{
     padding:8px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #e5e7eb;
+    color: #333;
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color .15s ease, opacity .15s ease;
+}
+
+button:hover{
+    background:#d3d6da;
+}
+
+button:disabled{
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* 💡 役割ごとに色を固定したボタン（青＝メイン、緑＝購入済み、赤＝削除、グレー＝キャンセル/戻る） */
+.btn{
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color .15s ease, opacity .15s ease;
+}
+
+.btn-primary{
+    background: #0070f3;
+    color: white;
+}
+.btn-primary:hover{
+    background: #005ac8;
+}
+
+.btn-success{
+    background: #34c759;
+    color: white;
+}
+.btn-success:hover{
+    background: #2aa84a;
+}
+
+.btn-danger{
+    background: #ff3b30;
+    color: white;
+}
+.btn-danger:hover{
+    background: #e0291f;
+}
+
+.btn-secondary{
+    background: #e5e7eb;
+    color: #333;
+}
+.btn-secondary:hover{
+    background: #d3d6da;
 }
 
 .book{
@@ -348,14 +407,6 @@ nav a:hover{
     align-items: center;
 }
 
-.small-button {
-    border: none;
-    background: #f4f4f4;
-    padding: 8px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
 .schedule-form .form label {
     display: block;
     margin-bottom: 16px;
@@ -374,15 +425,7 @@ nav a:hover{
 .schedule-form .form button {
     margin-top: 10px;
     padding: 12px 18px;
-    border: none;
-    background: #0070f3;
-    color: white;
     border-radius: 10px;
-    cursor: pointer;
-}
-
-.schedule-form .form button:hover {
-    background: #005ac8;
 }
 
 .reading-calendar,
@@ -433,44 +476,6 @@ nav a:hover{
     margin-bottom: 0;
 }
 
-.calendar-item.release {
-    background: #fff4f8;
-    border: 1px solid #ffb8d0;
-}
-
-.calendar-item.release-today {
-    background: #fff0f3;
-    border: 1px solid #ff6b9d;
-}
-
-.calendar-item.release-today div {
-    color: #e6005c;
-    font-weight: bold;
-}
-
-.release-badge {
-    display: inline-block;
-    margin: 6px 0 0;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.release-badge.upcoming {
-    background: #eef4ff;
-    color: #2f5fd0;
-}
-
-.release-badge.today {
-    background: #ffe3ec;
-    color: #e6005c;
-}
-
-.release-today-card {
-    border-left: 4px solid #ff6b9d;
-}
-
 .risk-dot {
     display: inline-block;
     width: 12px;
@@ -505,7 +510,7 @@ nav a:hover{
     grid-column: 1 / -1;
 }
 
-.book-detail .small-button {
+.book-detail .btn-secondary {
     margin-bottom: 15px;
 }
 
@@ -581,7 +586,6 @@ nav a:hover{
     flex-direction: column;
     gap: 8px;
     box-sizing: border-box;
-    overflow: hidden;
     transition: right .25s ease;
 }
 
@@ -590,7 +594,7 @@ nav a:hover{
 }
 
 .side-menu a,
-.side-menu button:not(.side-menu-close) {
+.side-menu button {
     display: block;
     width: 100%;
     text-align: left;
@@ -607,32 +611,22 @@ nav a:hover{
 }
 
 .side-menu a:hover,
-.side-menu button:not(.side-menu-close):hover {
+.side-menu button:hover {
     background: #e9edf2;
 }
 
 .side-menu-close {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    min-width: 0;
-    padding: 0;
+    top: 12px;
+    right: 15px;
     background: none;
-    border: none;
-    border-radius: 8px;
-    font-size: 24px;
-    line-height: 1;
+    font-size: 26px;
     color: #333;
-    cursor: pointer;
-    box-sizing: border-box;
+    padding: 0;
+    width: auto;
 }
 
 .side-menu-close:hover {
-    background: #f0f0f0;
+    background: none;
     color: #4A90E2;
 }
