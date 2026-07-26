@@ -32,6 +32,17 @@ function getTsundokuRisk(book) {
     return { color, days };
 }
 
+// 💡 読書進捗：総ページ数(pages)が入力されていれば、現在のページ(current_page)との割合を計算する
+function getReadingProgress(book) {
+    const total = Number(book.pages) || 0;
+    if (total <= 0) return null;
+
+    const current = Number(book.current_page) || 0;
+    const percent = Math.min(100, Math.max(0, Math.round((current / total) * 100)));
+
+    return { current, total, percent };
+}
+
 // ---- Wishlist / migration utilities ----
 async function runOneTimeMigration() {
     const user = await getCurrentUser();
@@ -440,6 +451,7 @@ export function displayBooks() {
 
         if (!(matchesKeyword && matchesTab)) return;
         const risk = getTsundokuRisk(book);
+        const progress = getReadingProgress(book);
 
         htmlParts.push(`
             <div class="book status-${book.status}">
@@ -452,6 +464,12 @@ export function displayBooks() {
                     <p>ISBN：${escapeHTML(book.isbn || "なし")}</p>
                     ${book.price ? `<p>価格：${escapeHTML(book.price)}円</p>` : ""}
                     ${risk ? `<p><span class="risk-dot ${risk.color}" title="登録から${risk.days}日"></span>積読${risk.days}日目</p>` : ""}
+                    ${progress ? `
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill" style="width:${progress.percent}%;"></div>
+                        </div>
+                        <p>📖 ${progress.current} / ${progress.total} ページ（${progress.percent}%）</p>
+                    ` : ""}
 
                     <p>
                         評価：
@@ -515,6 +533,7 @@ async function renderBookDetailView() {
     }
 
     const risk = getTsundokuRisk(book);
+    const progress = getReadingProgress(book);
 
     list.innerHTML = `
         <div class="book-detail">
@@ -528,6 +547,26 @@ async function renderBookDetailView() {
                     <p>ISBN：${escapeHTML(book.isbn || "なし")}</p>
                     ${book.price ? `<p>価格：${escapeHTML(book.price)}円</p>` : ""}
                     ${risk ? `<p><span class="risk-dot ${risk.color}" title="登録から${risk.days}日"></span>積読${risk.days}日目</p>` : ""}
+
+                    <div class="reading-progress">
+                        <p class="reading-progress-title">読書進捗</p>
+                        <p class="reading-progress-inputs">
+                            <label>総ページ数
+                                <input type="number" id="totalPagesInput" min="0" value="${book.pages || ""}">
+                            </label>
+                            <label>今読んだページ
+                                <input type="number" id="currentPageInput" min="0" value="${book.current_page || ""}">
+                            </label>
+                            <button class="btn btn-primary" onclick="updateReadingProgress('${book.id}')">更新</button>
+                        </p>
+                        ${progress ? `
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar-fill" style="width:${progress.percent}%;"></div>
+                            </div>
+                            <p>${progress.current} / ${progress.total} ページ（${progress.percent}%）</p>
+                        ` : `<p class="no-rating">総ページ数を入力すると進捗が表示されます。</p>`}
+                    </div>
+
                     <div id="bookDetailDescription" class="book-detail-description">あらすじを読み込み中...</div>
                 </div>
             </div>
@@ -582,6 +621,27 @@ export async function deleteBook(bookId) {
     if (error) {
         console.error(error);
         alert("本の削除に失敗しました。もう一度お試しください。");
+        return;
+    }
+
+    await loadBooks();
+}
+
+export async function updateReadingProgress(bookId) {
+    const totalInput = document.getElementById("totalPagesInput");
+    const currentInput = document.getElementById("currentPageInput");
+
+    const totalPages = Math.max(0, Number(totalInput?.value) || 0);
+    const currentPage = Math.max(0, Number(currentInput?.value) || 0);
+
+    const { error } = await supabase
+        .from("books")
+        .update({ pages: totalPages, current_page: currentPage })
+        .eq("id", bookId);
+
+    if (error) {
+        console.error(error);
+        alert("読書進捗の更新に失敗しました。もう一度お試しください。");
         return;
     }
 
