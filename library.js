@@ -16,6 +16,7 @@ import {
 import { renderSchedulePage } from './schedule.js';
 import { renderStatsPage, getMonthlyTsundokuChange } from './stats.js';
 import { fetchRakutenBookByIsbn } from './rakutenSearch.js';
+import { formatReleaseDateHtml } from './releaseDate.js';
 
 // 💡 積読危険度：未読ステータスの本について、登録からの経過日数で判定
 // 10日以内→緑、10〜30日→黄、30日超→赤
@@ -405,6 +406,7 @@ export function displayBooks() {
                         <p>出版社：${escapeHTML(w.publisher || "不明")}</p>
                         <p>ISBN：${escapeHTML(w.isbn || "なし")}</p>
                         ${w.price ? `<p>価格：${escapeHTML(w.price)}円</p>` : ""}
+                        ${formatReleaseDateHtml(w.publish_date)}
 
                         <p>
                             <button onclick="purchaseWishlistItem('${w.id}')">購入済みにする</button>
@@ -438,6 +440,7 @@ export function displayBooks() {
                     <p>出版社：${escapeHTML(book.publisher || "不明")}</p>
                     <p>ISBN：${escapeHTML(book.isbn || "なし")}</p>
                     ${book.price ? `<p>価格：${escapeHTML(book.price)}円</p>` : ""}
+                    ${formatReleaseDateHtml(book.publish_date)}
                     ${risk ? `<p><span class="risk-dot ${risk.color}" title="登録から${risk.days}日"></span>積読${risk.days}日目</p>` : ""}
 
                     <p>
@@ -514,6 +517,7 @@ async function renderBookDetailView() {
                     <p>出版社：${escapeHTML(book.publisher || "不明")}</p>
                     <p>ISBN：${escapeHTML(book.isbn || "なし")}</p>
                     ${book.price ? `<p>価格：${escapeHTML(book.price)}円</p>` : ""}
+                    ${formatReleaseDateHtml(book.publish_date)}
                     ${risk ? `<p><span class="risk-dot ${risk.color}" title="登録から${risk.days}日"></span>積読${risk.days}日目</p>` : ""}
                     <div id="bookDetailDescription" class="book-detail-description">あらすじを読み込み中...</div>
                 </div>
@@ -531,6 +535,13 @@ async function renderBookDetailView() {
     try {
         const detail = await fetchRakutenBookByIsbn(book.isbn);
         descriptionEl.textContent = detail?.itemCaption || "あらすじは見つかりませんでした。";
+
+        if (!book.publish_date && detail?.salesDate) {
+            const releaseHtml = formatReleaseDateHtml(detail.salesDate);
+            if (releaseHtml) {
+                descriptionEl.insertAdjacentHTML("beforebegin", releaseHtml);
+            }
+        }
     } catch (e) {
         console.error(e);
         descriptionEl.textContent = "あらすじの取得に失敗しました。";
@@ -573,6 +584,7 @@ export async function renderWishlistPage() {
                         <p>出版社：${escapeHTML(item.publisher || "不明")}</p>
                         <p>ISBN：${escapeHTML(item.isbn || "なし")}</p>
                         ${item.price ? `<p>価格：${escapeHTML(item.price)}円</p>` : ""}
+                        ${formatReleaseDateHtml(item.publish_date)}
 
                         <p>
                             <button onclick="purchaseWishlistItem('${id}')">購入済みにする</button>
@@ -621,6 +633,7 @@ async function renderWishlistDetailView() {
                     <p>出版社：${escapeHTML(item.publisher || "不明")}</p>
                     <p>ISBN：${escapeHTML(item.isbn || "なし")}</p>
                     ${item.price ? `<p>価格：${escapeHTML(item.price)}円</p>` : ""}
+                    ${formatReleaseDateHtml(item.publish_date)}
                     <div id="wishlistDetailDescription" class="book-detail-description">あらすじを読み込み中...</div>
                     <p>
                         <button onclick="purchaseWishlistItem('${item.id}')">購入済みにする</button>
@@ -642,6 +655,13 @@ async function renderWishlistDetailView() {
     try {
         const detail = await fetchRakutenBookByIsbn(item.isbn);
         descriptionEl.textContent = detail?.itemCaption || "あらすじは見つかりませんでした。";
+
+        if (!item.publish_date && detail?.salesDate) {
+            const releaseHtml = formatReleaseDateHtml(detail.salesDate);
+            if (releaseHtml) {
+                descriptionEl.insertAdjacentHTML("beforebegin", releaseHtml);
+            }
+        }
     } catch (e) {
         console.error(e);
         descriptionEl.textContent = "あらすじの取得に失敗しました。";

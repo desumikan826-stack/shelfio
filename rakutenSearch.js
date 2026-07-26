@@ -71,6 +71,7 @@ export async function fetchRakutenBookByIsbn(isbn) {
     return {
         itemCaption: item.itemCaption || "",
         itemPrice: item.itemPrice || "",
+        salesDate: item.salesDate || "",
     };
 }
 

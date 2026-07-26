@@ -433,6 +433,44 @@ nav a:hover{
     margin-bottom: 0;
 }
 
+.calendar-item.release {
+    background: #fff4f8;
+    border: 1px solid #ffb8d0;
+}
+
+.calendar-item.release-today {
+    background: #fff0f3;
+    border: 1px solid #ff6b9d;
+}
+
+.calendar-item.release-today div {
+    color: #e6005c;
+    font-weight: bold;
+}
+
+.release-badge {
+    display: inline-block;
+    margin: 6px 0 0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.release-badge.upcoming {
+    background: #eef4ff;
+    color: #2f5fd0;
+}
+
+.release-badge.today {
+    background: #ffe3ec;
+    color: #e6005c;
+}
+
+.release-today-card {
+    border-left: 4px solid #ff6b9d;
+}
+
 .risk-dot {
     display: inline-block;
     width: 12px;
