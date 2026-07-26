@@ -4,11 +4,13 @@ import {
     wishlists,
     currentTab,
     detailBookId,
+    detailWishlistId,
     currentRating,
     setBooks,
     setWishlists,
     setCurrentTab,
     setDetailBookId,
+    setDetailWishlistId,
     setCurrentRating,
 } from './state.js';
 import { renderSchedulePage } from './schedule.js';
@@ -137,6 +139,7 @@ export async function loadBooks() {
     }
 
     displayBooks();
+    renderWishlistPage();
     renderSchedulePage();
     renderStatsPage();
 }
@@ -277,6 +280,26 @@ export async function addWishlistItem({ title, author, image = "", isbn = "", pu
 
     await loadBooks();
     alert("ほしい本として登録しました");
+}
+
+// 💡 wishlist.html の手動追加フォームから呼ばれる
+export async function addWishlistFromForm() {
+    const titleInput = document.getElementById("w-title");
+    const title = titleInput?.value.trim();
+
+    if (!title) {
+        alert("タイトルを入力してください");
+        return;
+    }
+
+    const author = document.getElementById("w-author")?.value.trim() || "";
+    const isbn = document.getElementById("w-isbn")?.value.trim() || "";
+    const image = document.getElementById("w-image")?.value.trim() || "";
+    const price = Number(document.getElementById("w-price")?.value) || 0;
+
+    await addWishlistItem({ title, author, isbn, image, price });
+
+    document.getElementById("wishlistForm")?.reset();
 }
 
 export async function deleteWishlistItem(wishId) {
@@ -619,4 +642,99 @@ export function switchTab(tabName) {
 
     // 画面を再表示してフィルターをかける
     displayBooks();
+}
+
+// ---- ほしい本ページ（wishlist.html）専用の一覧・詳細表示 ----
+export function renderWishlistPage() {
+    const list = document.getElementById("wishlistList");
+    if (!list) return; // wishlist.html以外のページでは何もしない
+
+    if (detailWishlistId) {
+        renderWishlistDetailView();
+        return;
+    }
+
+    if (!wishlists.length) {
+        list.innerHTML = "<p>ほしい本はまだありません。</p>";
+        return;
+    }
+
+    const sorted = [...wishlists].sort((a, b) => a.title.localeCompare(b.title, "ja"));
+
+    list.innerHTML = sorted.map((w) => `
+        <div class="book wishlist">
+            <img src="${escapeHTML(w.image || "")}" alt="表紙" class="book-image" onerror="this.style.display='none'">
+            <div class="book-info">
+                <h3 class="book-title-link" onclick="showWishlistDetail('${w.id}')">${escapeHTML(w.title)}</h3>
+                <p>著者：${escapeHTML(w.author)}</p>
+                <p>出版社：${escapeHTML(w.publisher || "不明")}</p>
+                <p>ISBN：${escapeHTML(w.isbn || "なし")}</p>
+                ${w.price ? `<p>価格：${escapeHTML(w.price)}円</p>` : ""}
+
+                <p>
+                    <button class="btn btn-success" onclick="purchaseWishlistItem('${w.id}')">購入済みにする</button>
+                    <button class="btn btn-danger" onclick="deleteWishlistItem('${w.id}')">削除</button>
+                </p>
+            </div>
+        </div>
+    `).join("");
+}
+
+export function showWishlistDetail(wishId) {
+    setDetailWishlistId(wishId);
+    renderWishlistPage();
+}
+
+export function backToWishlist() {
+    setDetailWishlistId(null);
+    renderWishlistPage();
+}
+
+async function renderWishlistDetailView() {
+    const list = document.getElementById("wishlistList");
+    const item = wishlists.find((w) => String(w.id) === String(detailWishlistId));
+
+    if (!list) return;
+
+    if (!item) {
+        setDetailWishlistId(null);
+        renderWishlistPage();
+        return;
+    }
+
+    list.innerHTML = `
+        <div class="book-detail">
+            <button class="btn btn-secondary" onclick="backToWishlist()">← 一覧に戻る</button>
+            <div class="book wishlist">
+                <img src="${escapeHTML(item.image || "")}" alt="表紙" class="book-image" onerror="this.style.display='none'">
+                <div class="book-info">
+                    <h3>${escapeHTML(item.title)}</h3>
+                    <p>著者：${escapeHTML(item.author)}</p>
+                    <p>出版社：${escapeHTML(item.publisher || "不明")}</p>
+                    <p>ISBN：${escapeHTML(item.isbn || "なし")}</p>
+                    ${item.price ? `<p>価格：${escapeHTML(item.price)}円</p>` : ""}
+                    <p>
+                        <button class="btn btn-success" onclick="purchaseWishlistItem('${item.id}')">購入済みにする</button>
+                        <button class="btn btn-danger" onclick="deleteWishlistItem('${item.id}')">削除</button>
+                    </p>
+                    <div id="wishlistDetailDescription" class="book-detail-description">あらすじを読み込み中...</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const descriptionEl = document.getElementById("wishlistDetailDescription");
+
+    if (!item.isbn) {
+        descriptionEl.textContent = "ISBNが登録されていないため、あらすじを取得できませんでした。";
+        return;
+    }
+
+    try {
+        const detail = await fetchRakutenBookByIsbn(item.isbn);
+        descriptionEl.textContent = detail?.itemCaption || "あらすじは見つかりませんでした。";
+    } catch (e) {
+        console.error(e);
+        descriptionEl.textContent = "あらすじの取得に失敗しました。";
+    }
 }
