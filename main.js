@@ -19,6 +19,7 @@ import {
     deleteBook,
     togglePurchased,
     updateReadingProgress,
+    updateSeriesInfo,
     changeStatus,
     toggleStatusMenu,
     switchTab,
@@ -44,6 +45,7 @@ window.deleteBook = deleteBook;
 window.changeRating = changeRating;
 window.togglePurchased = togglePurchased;
 window.updateReadingProgress = updateReadingProgress;
+window.updateSeriesInfo = updateSeriesInfo;
 window.changeStatus = changeStatus;
 window.displayBooks = displayBooks;
 window.addScheduleItem = addScheduleItem;

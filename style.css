@@ -527,6 +527,15 @@ nav a:hover{
     border-radius: 10px;
 }
 
+.reading-progress-compact {
+    margin: 10px 0;
+    padding: 10px 12px;
+}
+
+.reading-progress-compact .reading-progress-inputs input {
+    width: 70px;
+}
+
 .reading-progress-title {
     margin: 0 0 8px;
     font-weight: bold;
@@ -567,6 +576,25 @@ nav a:hover{
     background: #0070f3;
     border-radius: 999px;
     transition: width .2s ease;
+}
+
+.volume-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    margin: 2px 4px 2px 0;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.volume-badge.owned {
+    background: #dff5e6;
+    color: #1e8a43;
+}
+
+.volume-badge.missing {
+    background: #ffe8e6;
+    color: #d9291f;
 }
 
 .stats-section {
