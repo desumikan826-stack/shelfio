@@ -875,3 +875,146 @@ nav a:hover{
     min-width: 160px;
     margin-right: 0;
 }
+
+/* ============================================================
+   レスポンシブ対応（タブレット・スマートフォン）
+   ============================================================ */
+
+/* タブレット（〜900px） */
+@media (max-width: 900px) {
+    body{
+        margin: 20px;
+    }
+
+    .book-list{
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-grid{
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .login-container{
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .modal-content{
+        width: 90%;
+        max-width: 400px;
+    }
+}
+
+/* スマートフォン（〜600px） */
+@media (max-width: 600px) {
+    body{
+        margin: 14px;
+        font-size: 15px;
+    }
+
+    header{
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .logo{
+        font-size: 19px;
+    }
+
+    nav{
+        gap: 12px;
+    }
+
+    nav a{
+        font-size: 13px;
+    }
+
+    .hamburger-btn{
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    main h2, body > h2{
+        font-size: 20px;
+    }
+
+    /* input/selectのfont-sizeが16px未満だとiOS Safariがフォーカス時に
+       自動でズームしてしまうため、スマホでは16px以上を確保する */
+    input, select{
+        font-size: 16px;
+        padding: 8px;
+    }
+
+    .search input{
+        width: 100%;
+    }
+
+    .book{
+        padding: 14px;
+        gap: 14px;
+    }
+
+    .book-info h3{
+        font-size: 17px;
+    }
+
+    .book-image{
+        width: 90px;
+    }
+
+    .tabs, .tag-filter-bar{
+        width: 100%;
+        overflow-x: auto;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-btn{
+        padding: 7px 14px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .calendar-grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .reading-progress-inputs,
+    .meta-editor{
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reading-progress-inputs input,
+    .reading-progress-compact .reading-progress-inputs input,
+    .meta-editor input{
+        width: 100%;
+    }
+
+    .login-container{
+        margin: 30px auto;
+        padding: 26px 20px;
+    }
+
+    .side-menu{
+        width: 240px;
+    }
+}
+
+/* 小さめのスマートフォン（〜380px） */
+@media (max-width: 380px) {
+    .book{
+        flex-direction: column;
+    }
+
+    .book-image{
+        width: 100%;
+        max-width: 160px;
+        margin: 0 auto;
+    }
+
+    .calendar-grid{
+        grid-template-columns: 1fr;
+    }
+}
