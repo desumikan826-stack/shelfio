@@ -734,29 +734,12 @@ export function displayBooks() {
                         </div>
                     ` : ""}
 
-                    <div class="meta-editor">
-                        <label>📁 フォルダ
-                            <input type="text" list="collectionOptions" id="collectionInput-${book.id}" value="${escapeHTML(book.collection || "")}" placeholder="ラノベ、漫画...">
-                        </label>
-                        <button class="btn btn-secondary" onclick="updateCollection('${book.id}')">保存</button>
-                    </div>
-
-                    <div class="tag-editor">
-                        <p class="tag-chip-row">
-                            ${(book.tags && book.tags.length)
-                                ? book.tags.map((t) => `
-                                    <span class="tag-chip">
-                                        #${escapeHTML(t)}
-                                        <button type="button" class="tag-chip-remove" data-book-id="${book.id}" data-tag="${escapeHTML(t)}" aria-label="タグを削除">×</button>
-                                    </span>
-                                `).join("")
-                                : `<span class="no-rating">タグはまだありません</span>`}
+                    ${(book.collection || (book.tags && book.tags.length)) ? `
+                        <p class="meta-display">
+                            ${book.collection ? `<span class="collection-chip">📁 ${escapeHTML(book.collection)}</span>` : ""}
+                            ${(book.tags || []).map((t) => `<span class="tag-chip">#${escapeHTML(t)}</span>`).join("")}
                         </p>
-                        <p class="reading-progress-inputs">
-                            <input type="text" id="newTagInput-${book.id}" placeholder="新しいタグ（例：積読）" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag('${book.id}');}">
-                            <button type="button" class="btn btn-secondary" onclick="addTag('${book.id}')">＋ タグ追加</button>
-                        </p>
-                    </div>
+                    ` : ""}
 
                     <p>
                         評価：
@@ -795,7 +778,6 @@ export function displayBooks() {
     });
 
     list.innerHTML = htmlParts.join("");
-    bindTagRemoveButtons(list);
 }
 
 export function showBookDetail(bookId) {

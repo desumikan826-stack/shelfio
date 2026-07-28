@@ -820,6 +820,21 @@ nav a:hover{
     color: var(--color-accent);
 }
 
+.meta-display {
+    margin: 8px 0;
+}
+
+.collection-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    margin: 2px 6px 2px 0;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #E4EBF1;
+    color: var(--color-primary);
+}
+
 .tag-chip-remove {
     border: none;
     background: none;
