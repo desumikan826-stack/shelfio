@@ -1,7 +1,7 @@
 /* ============================================================
-Shelfio — デザイントークン
-「私設図書館の蔵書カード」をコンセプトに、
-温かい紙の質感 × 深いネイビー × 真鍮色のアクセントでまとめる
+   Shelfio — デザイントークン
+   「私設図書館の蔵書カード」をコンセプトに、
+   温かい紙の質感 × 深いネイビー × 真鍮色のアクセントでまとめる
    ============================================================ */
 :root{
     --color-bg: #F7F1E4;
@@ -818,6 +818,26 @@ nav a:hover{
     font-weight: 600;
     background: #F1E6D2;
     color: var(--color-accent);
+}
+
+.tag-chip-remove {
+    border: none;
+    background: none;
+    padding: 0;
+    margin-left: 6px;
+    color: var(--color-accent);
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.tag-chip-remove:hover {
+    color: var(--color-danger);
+}
+
+.tag-editor {
+    margin: 10px 0;
 }
 
 .meta-editor {

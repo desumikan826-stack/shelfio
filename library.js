@@ -202,28 +202,83 @@ function renderTagFilterBar() {
     });
 }
 
-export async function updateBookMeta(bookId) {
+export async function updateCollection(bookId) {
     const collectionInput = document.getElementById(`collectionInput-${bookId}`);
-    const tagsInput = document.getElementById(`tagsInput-${bookId}`);
-
     const collection = collectionInput?.value.trim() || null;
-    const tags = (tagsInput?.value || "")
-        .split(/[,、]/)
-        .map((t) => t.trim().replace(/^#/, ""))
-        .filter(Boolean);
 
     const { error } = await supabase
         .from("books")
-        .update({ collection, tags })
+        .update({ collection })
         .eq("id", bookId);
 
     if (error) {
         console.error(error);
-        alert("フォルダ・タグの更新に失敗しました。もう一度お試しください。");
+        alert("フォルダの更新に失敗しました。もう一度お試しください。");
         return;
     }
 
     await loadBooks();
+}
+
+export async function addTag(bookId) {
+    const input = document.getElementById(`newTagInput-${bookId}`);
+    const raw = (input?.value || "").trim().replace(/^#/, "");
+    if (!raw) return;
+
+    const book = books.find((b) => String(b.id) === String(bookId));
+    if (!book) return;
+
+    const existingTags = book.tags || [];
+    if (existingTags.some((t) => t.toLowerCase() === raw.toLowerCase())) {
+        if (input) input.value = "";
+        return; // 同じタグは重複追加しない
+    }
+
+    const newTags = [...existingTags, raw];
+
+    const { error } = await supabase
+        .from("books")
+        .update({ tags: newTags })
+        .eq("id", bookId);
+
+    if (error) {
+        console.error(error);
+        alert("タグの追加に失敗しました。もう一度お試しください。");
+        return;
+    }
+
+    await loadBooks();
+}
+
+export async function removeTag(bookId, tag) {
+    const book = books.find((b) => String(b.id) === String(bookId));
+    if (!book) return;
+
+    const newTags = (book.tags || []).filter((t) => t !== tag);
+
+    const { error } = await supabase
+        .from("books")
+        .update({ tags: newTags })
+        .eq("id", bookId);
+
+    if (error) {
+        console.error(error);
+        alert("タグの削除に失敗しました。もう一度お試しください。");
+        return;
+    }
+
+    await loadBooks();
+}
+
+// 💡 タグ削除ボタン（✕）にイベントを紐づける。タグ文字列に引用符などが含まれても安全なように
+// inline onclick ではなく data属性 + addEventListener で処理する
+function bindTagRemoveButtons(container) {
+    if (!container) return;
+    container.querySelectorAll(".tag-chip-remove").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            removeTag(btn.dataset.bookId, btn.dataset.tag);
+        });
+    });
 }
 
 // ---- Wishlist / migration utilities ----
@@ -679,19 +734,28 @@ export function displayBooks() {
                         </div>
                     ` : ""}
 
-                    ${(book.tags && book.tags.length) ? `
-                        <p class="tag-chip-row">
-                            ${book.tags.map((t) => `<span class="tag-chip">#${escapeHTML(t)}</span>`).join("")}
-                        </p>
-                    ` : ""}
                     <div class="meta-editor">
                         <label>📁 フォルダ
                             <input type="text" list="collectionOptions" id="collectionInput-${book.id}" value="${escapeHTML(book.collection || "")}" placeholder="ラノベ、漫画...">
                         </label>
-                        <label>🏷 タグ（カンマ区切り）
-                            <input type="text" id="tagsInput-${book.id}" value="${escapeHTML((book.tags || []).join(", "))}" placeholder="積読, 神作品, 泣ける">
-                        </label>
-                        <button class="btn btn-secondary" onclick="updateBookMeta('${book.id}')">保存</button>
+                        <button class="btn btn-secondary" onclick="updateCollection('${book.id}')">保存</button>
+                    </div>
+
+                    <div class="tag-editor">
+                        <p class="tag-chip-row">
+                            ${(book.tags && book.tags.length)
+                                ? book.tags.map((t) => `
+                                    <span class="tag-chip">
+                                        #${escapeHTML(t)}
+                                        <button type="button" class="tag-chip-remove" data-book-id="${book.id}" data-tag="${escapeHTML(t)}" aria-label="タグを削除">×</button>
+                                    </span>
+                                `).join("")
+                                : `<span class="no-rating">タグはまだありません</span>`}
+                        </p>
+                        <p class="reading-progress-inputs">
+                            <input type="text" id="newTagInput-${book.id}" placeholder="新しいタグ（例：積読）" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag('${book.id}');}">
+                            <button type="button" class="btn btn-secondary" onclick="addTag('${book.id}')">＋ タグ追加</button>
+                        </p>
                     </div>
 
                     <p>
@@ -731,6 +795,7 @@ export function displayBooks() {
     });
 
     list.innerHTML = htmlParts.join("");
+    bindTagRemoveButtons(list);
 }
 
 export function showBookDetail(bookId) {
@@ -828,21 +893,31 @@ async function renderBookDetailView() {
                     </div>
 
                     <div class="reading-progress">
-                        <p class="reading-progress-title">フォルダ・タグ</p>
+                        <p class="reading-progress-title">フォルダ</p>
                         <p class="reading-progress-inputs">
                             <label>📁 フォルダ
                                 <input type="text" list="collectionOptions" id="collectionInput-${book.id}" value="${escapeHTML(book.collection || "")}" placeholder="ラノベ、漫画...">
                             </label>
-                            <label>🏷 タグ（カンマ区切り）
-                                <input type="text" id="tagsInput-${book.id}" value="${escapeHTML((book.tags || []).join(", "))}" placeholder="積読, 神作品, 泣ける">
-                            </label>
-                            <button class="btn btn-primary" onclick="updateBookMeta('${book.id}')">保存</button>
+                            <button class="btn btn-primary" onclick="updateCollection('${book.id}')">保存</button>
                         </p>
-                        ${(book.tags && book.tags.length) ? `
-                            <p class="tag-chip-row">
-                                ${book.tags.map((t) => `<span class="tag-chip">#${escapeHTML(t)}</span>`).join("")}
-                            </p>
-                        ` : `<p class="no-rating">タグはまだありません。</p>`}
+                    </div>
+
+                    <div class="reading-progress tag-editor">
+                        <p class="reading-progress-title">タグ</p>
+                        <p class="tag-chip-row">
+                            ${(book.tags && book.tags.length)
+                                ? book.tags.map((t) => `
+                                    <span class="tag-chip">
+                                        #${escapeHTML(t)}
+                                        <button type="button" class="tag-chip-remove" data-book-id="${book.id}" data-tag="${escapeHTML(t)}" aria-label="タグを削除">×</button>
+                                    </span>
+                                `).join("")
+                                : `<span class="no-rating">タグはまだありません</span>`}
+                        </p>
+                        <p class="reading-progress-inputs">
+                            <input type="text" id="newTagInput-${book.id}" placeholder="新しいタグ（例：積読）" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag('${book.id}');}">
+                            <button type="button" class="btn btn-primary" onclick="addTag('${book.id}')">＋ タグ追加</button>
+                        </p>
                     </div>
 
                     <div id="bookDetailDescription" class="book-detail-description">あらすじを読み込み中...</div>
@@ -850,6 +925,8 @@ async function renderBookDetailView() {
             </div>
         </div>
     `;
+
+    bindTagRemoveButtons(list);
 
     const descriptionEl = document.getElementById("bookDetailDescription");
 
