@@ -6,12 +6,16 @@ import {
     detailBookId,
     detailWishlistId,
     currentRating,
+    currentCollectionFilter,
+    currentTagFilter,
     setBooks,
     setWishlists,
     setCurrentTab,
     setDetailBookId,
     setDetailWishlistId,
     setCurrentRating,
+    setCurrentCollectionFilter,
+    setCurrentTagFilter,
 } from './state.js';
 import { renderSchedulePage } from './schedule.js';
 import { renderStatsPage, getMonthlyTsundokuChange } from './stats.js';
@@ -112,6 +116,114 @@ function getSeriesVolumeStatus(book) {
         totalKnown: Number(book.series_total_volumes) > 0,
         source: "manual",
     };
+}
+
+// ---- タグ / フォルダ（コレクション） ----
+function getDistinctCollections() {
+    const set = new Set();
+    books.forEach((b) => {
+        const c = (b.collection || "").trim();
+        if (c) set.add(c);
+    });
+    return [...set].sort((a, b) => a.localeCompare(b, "ja"));
+}
+
+function getDistinctTags() {
+    const set = new Set();
+    books.forEach((b) => {
+        (b.tags || []).forEach((t) => {
+            const trimmed = (t || "").trim();
+            if (trimmed) set.add(trimmed);
+        });
+    });
+    return [...set].sort((a, b) => a.localeCompare(b, "ja"));
+}
+
+// 💡 フォルダ絞り込みタブを描画する（list.html の #collectionTabs のみで動作）
+function renderCollectionTabs() {
+    const container = document.getElementById("collectionTabs");
+    if (!container) return;
+
+    const collections = getDistinctCollections();
+    const hasUncategorized = books.some((b) => !(b.collection || "").trim());
+
+    const options = [{ value: null, label: "📁 すべて" }];
+    collections.forEach((c) => options.push({ value: c, label: c }));
+    if (hasUncategorized) options.push({ value: "__uncategorized__", label: "未分類" });
+
+    container.innerHTML = options
+        .map((opt, i) => `
+            <button type="button" class="tab-btn ${currentCollectionFilter === opt.value ? "active" : ""}" data-collection-index="${i}">
+                ${escapeHTML(opt.label)}
+            </button>
+        `)
+        .join("") + `
+        <datalist id="collectionOptions">
+            ${collections.map((c) => `<option value="${escapeHTML(c)}"></option>`).join("")}
+        </datalist>
+    `;
+
+    container.querySelectorAll("button[data-collection-index]").forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+            setCurrentCollectionFilter(options[i].value);
+            displayBooks();
+            renderCollectionTabs();
+        });
+    });
+}
+
+// 💡 タグ絞り込みバーを描画する（list.html の #tagFilterBar のみで動作）
+function renderTagFilterBar() {
+    const container = document.getElementById("tagFilterBar");
+    if (!container) return;
+
+    const tags = getDistinctTags();
+    if (!tags.length) {
+        container.innerHTML = "";
+        return;
+    }
+
+    const options = [{ value: null, label: "すべて" }, ...tags.map((t) => ({ value: t, label: `#${t}` }))];
+
+    container.innerHTML = options
+        .map((opt, i) => `
+            <button type="button" class="tag-filter-btn ${currentTagFilter === opt.value ? "active" : ""}" data-tag-index="${i}">
+                ${escapeHTML(opt.label)}
+            </button>
+        `)
+        .join("");
+
+    container.querySelectorAll("button[data-tag-index]").forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+            setCurrentTagFilter(options[i].value);
+            displayBooks();
+            renderTagFilterBar();
+        });
+    });
+}
+
+export async function updateBookMeta(bookId) {
+    const collectionInput = document.getElementById(`collectionInput-${bookId}`);
+    const tagsInput = document.getElementById(`tagsInput-${bookId}`);
+
+    const collection = collectionInput?.value.trim() || null;
+    const tags = (tagsInput?.value || "")
+        .split(/[,、]/)
+        .map((t) => t.trim().replace(/^#/, ""))
+        .filter(Boolean);
+
+    const { error } = await supabase
+        .from("books")
+        .update({ collection, tags })
+        .eq("id", bookId);
+
+    if (error) {
+        console.error(error);
+        alert("フォルダ・タグの更新に失敗しました。もう一度お試しください。");
+        return;
+    }
+
+    await loadBooks();
 }
 
 // ---- Wishlist / migration utilities ----
@@ -221,6 +333,8 @@ export async function loadBooks() {
     }
 
     displayBooks();
+    renderCollectionTabs();
+    renderTagFilterBar();
     renderWishlistPage();
     renderSchedulePage();
     renderStatsPage();
@@ -515,12 +629,22 @@ export function displayBooks() {
     sortedBooks.forEach((book) => {
         const matchesKeyword =
             (book.title || "").toLowerCase().includes(keyword) ||
-            (book.author || "").toLowerCase().includes(keyword);
+            (book.author || "").toLowerCase().includes(keyword) ||
+            (book.tags || []).some((t) => (t || "").toLowerCase().includes(keyword));
 
         const matchesTab =
             currentTab === "all" || book.status === currentTab;
 
-        if (!(matchesKeyword && matchesTab)) return;
+        const matchesCollection =
+            !currentCollectionFilter ||
+            (currentCollectionFilter === "__uncategorized__"
+                ? !(book.collection || "").trim()
+                : (book.collection || "").trim() === currentCollectionFilter);
+
+        const matchesTagFilter =
+            !currentTagFilter || (book.tags || []).includes(currentTagFilter);
+
+        if (!(matchesKeyword && matchesTab && matchesCollection && matchesTagFilter)) return;
         const risk = getTsundokuRisk(book);
         const progress = getReadingProgress(book);
 
@@ -554,6 +678,21 @@ export function displayBooks() {
                             ` : ""}
                         </div>
                     ` : ""}
+
+                    ${(book.tags && book.tags.length) ? `
+                        <p class="tag-chip-row">
+                            ${book.tags.map((t) => `<span class="tag-chip">#${escapeHTML(t)}</span>`).join("")}
+                        </p>
+                    ` : ""}
+                    <div class="meta-editor">
+                        <label>📁 フォルダ
+                            <input type="text" list="collectionOptions" id="collectionInput-${book.id}" value="${escapeHTML(book.collection || "")}" placeholder="ラノベ、漫画...">
+                        </label>
+                        <label>🏷 タグ（カンマ区切り）
+                            <input type="text" id="tagsInput-${book.id}" value="${escapeHTML((book.tags || []).join(", "))}" placeholder="積読, 神作品, 泣ける">
+                        </label>
+                        <button class="btn btn-secondary" onclick="updateBookMeta('${book.id}')">保存</button>
+                    </div>
 
                     <p>
                         評価：
@@ -686,6 +825,24 @@ async function renderBookDetailView() {
                                 </p>
                             ` : `<p class="no-rating">全巻数を入力すると、足りない巻がわかります。</p>`}
                         ` : `<p class="no-rating">シリーズ名を入力すると、持っている巻・足りない巻が表示されます。</p>`}
+                    </div>
+
+                    <div class="reading-progress">
+                        <p class="reading-progress-title">フォルダ・タグ</p>
+                        <p class="reading-progress-inputs">
+                            <label>📁 フォルダ
+                                <input type="text" list="collectionOptions" id="collectionInput-${book.id}" value="${escapeHTML(book.collection || "")}" placeholder="ラノベ、漫画...">
+                            </label>
+                            <label>🏷 タグ（カンマ区切り）
+                                <input type="text" id="tagsInput-${book.id}" value="${escapeHTML((book.tags || []).join(", "))}" placeholder="積読, 神作品, 泣ける">
+                            </label>
+                            <button class="btn btn-primary" onclick="updateBookMeta('${book.id}')">保存</button>
+                        </p>
+                        ${(book.tags && book.tags.length) ? `
+                            <p class="tag-chip-row">
+                                ${book.tags.map((t) => `<span class="tag-chip">#${escapeHTML(t)}</span>`).join("")}
+                            </p>
+                        ` : `<p class="no-rating">タグはまだありません。</p>`}
                     </div>
 
                     <div id="bookDetailDescription" class="book-detail-description">あらすじを読み込み中...</div>

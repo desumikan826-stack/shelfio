@@ -21,6 +21,7 @@ import {
     updateReadingProgress,
     updateSeriesInfo,
     searchSeriesVolumes,
+    updateBookMeta,
     changeStatus,
     toggleStatusMenu,
     switchTab,
@@ -48,6 +49,7 @@ window.togglePurchased = togglePurchased;
 window.updateReadingProgress = updateReadingProgress;
 window.updateSeriesInfo = updateSeriesInfo;
 window.searchSeriesVolumes = searchSeriesVolumes;
+window.updateBookMeta = updateBookMeta;
 window.changeStatus = changeStatus;
 window.displayBooks = displayBooks;
 window.addScheduleItem = addScheduleItem;

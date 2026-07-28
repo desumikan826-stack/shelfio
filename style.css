@@ -1,7 +1,7 @@
 /* ============================================================
-   Shelfio — デザイントークン
-   「私設図書館の蔵書カード」をコンセプトに、
-   温かい紙の質感 × 深いネイビー × 真鍮色のアクセントでまとめる
+Shelfio — デザイントークン
+「私設図書館の蔵書カード」をコンセプトに、
+温かい紙の質感 × 深いネイビー × 真鍮色のアクセントでまとめる
    ============================================================ */
 :root{
     --color-bg: #F7F1E4;
@@ -773,4 +773,70 @@ nav a:hover{
 .side-menu-close:hover {
     background: rgba(43, 38, 32, .08);
     color: var(--color-primary);
+}
+
+/* フォルダ（コレクション）絞り込み・タグ絞り込み・タグチップ */
+.tag-filter-bar {
+    background: transparent;
+    padding: 0;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tag-filter-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-ink-soft);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.tag-filter-btn:hover {
+    border-color: var(--color-accent);
+}
+
+.tag-filter-btn.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
+.tag-chip-row {
+    margin: 6px 0;
+}
+
+.tag-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    margin: 2px 4px 2px 0;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #F1E6D2;
+    color: var(--color-accent);
+}
+
+.meta-editor {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.meta-editor label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--color-ink-soft);
+}
+
+.meta-editor input {
+    min-width: 160px;
+    margin-right: 0;
 }
