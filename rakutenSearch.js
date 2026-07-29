@@ -33,6 +33,7 @@ export async function fetchRakutenResults(keyword, searchType) {
                 itemPrice: info.itemPrice || "",
                 largeImageUrl: info.largeImageUrl || "",
                 isbn: (info.isbn || "").replace(/-/g, ""),
+                itemUrl: info.affiliateUrl || info.itemUrl || "",
                 source: "rakuten"
             };
         });
@@ -155,6 +156,7 @@ export function renderSearchPage() {
             <p>著者：${escapeHTML(info.author)}</p>
             ${info.salesDate ? `<p>発売日：${escapeHTML(info.salesDate)}</p>` : ""}
             ${info.itemPrice ? `<p>価格：${escapeHTML(info.itemPrice)}円</p>` : ""}
+            ${info.itemUrl ? `<p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(info.itemUrl)}" target="_blank" rel="noopener noreferrer">🛒 楽天ブックスで購入</a></p>` : ""}
         `;
 
         const button = document.createElement("button");

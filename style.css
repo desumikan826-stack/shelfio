@@ -105,12 +105,20 @@ button:disabled{
 
 /* 💡 役割ごとに色を固定したボタン（青＝メイン、緑＝購入済み、赤＝削除、グレー＝キャンセル/戻る） */
 .btn{
+    display: inline-block;
     padding: 8px 16px;
     border: none;
     border-radius: var(--radius-sm);
     font-weight: bold;
+    text-decoration: none;
     cursor: pointer;
     transition: background-color .15s ease, opacity .15s ease;
+}
+
+.rakuten-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .btn-primary{
