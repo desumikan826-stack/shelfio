@@ -56,31 +56,35 @@
 
 <div id="searchResult"></div>
 
+<p class="reading-progress-title">手動で登録</p>
 <div class="form">
     <input id="title" placeholder="本のタイトル">
     <input id="author" placeholder="著者">
     <input id="price" type="number" min="0" placeholder="価格(円)">
-<div id="rating" class="rating">
-    <span onclick="setRating(1)">☆</span>
-    <span onclick="setRating(2)">☆</span>
-    <span onclick="setRating(3)">☆</span>
-    <span onclick="setRating(4)">☆</span>
-    <span onclick="setRating(5)">☆</span>
-    <label>
-    <input type="checkbox" id="purchased">
-    購入済み
-</label>
 
-<label>
-    読書状況
-    <select id="status">
-        <option value="unread">未読</option>
-        <option value="reading">読書中</option>
-        <option value="finished">読了済み</option>
-    </select>
-</label>
-</div>
-<button class="btn btn-primary" onclick="addBook()">登録</button>
+    <div id="rating" class="rating">
+        <span onclick="setRating(1)">☆</span>
+        <span onclick="setRating(2)">☆</span>
+        <span onclick="setRating(3)">☆</span>
+        <span onclick="setRating(4)">☆</span>
+        <span onclick="setRating(5)">☆</span>
+    </div>
+
+    <label>
+        <input type="checkbox" id="purchased">
+        購入済み
+    </label>
+
+    <label>
+        読書状況
+        <select id="status">
+            <option value="unread">未読</option>
+            <option value="reading">読書中</option>
+            <option value="finished">読了済み</option>
+        </select>
+    </label>
+
+    <button class="btn btn-primary" onclick="addBook()">登録</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

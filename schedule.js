@@ -219,7 +219,7 @@ export async function renderSchedulePage() {
 
     if (scheduleList) {
         if (!items.length) {
-            scheduleList.innerHTML = "<p>まだ更新スケジュールが登録されていません。</p>";
+            scheduleList.innerHTML = `<div class="empty-state">🗓 <p>まだ更新スケジュールが登録されていません。</p></div>`;
             return;
         }
 

@@ -747,7 +747,9 @@ export function displayBooks() {
         `);
     });
 
-    list.innerHTML = htmlParts.join("");
+    list.innerHTML = htmlParts.length
+        ? htmlParts.join("")
+        : `<div class="empty-state">📚 <p>該当する本が見つかりませんでした。</p></div>`;
 }
 
 export function showBookDetail(bookId) {
@@ -1088,7 +1090,7 @@ export function renderWishlistPage() {
     }
 
     if (!wishlists.length) {
-        list.innerHTML = "<p>ほしい本はまだありません。</p>";
+        list.innerHTML = `<div class="empty-state">💖 <p>ほしい本はまだありません。</p></div>`;
         return;
     }
 
