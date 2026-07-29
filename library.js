@@ -647,38 +647,7 @@ export function displayBooks() {
         sortedBooks.sort((a, b) => a.title.localeCompare(b.title, "ja"));
     }
 
-    const sortedWishlists = [...wishlists];
-    if (sortType === "title") {
-        sortedWishlists.sort((a, b) => a.title.localeCompare(b.title, "ja"));
-    }
-
     const htmlParts = [];
-
-    // 「ほしい本」を表示（タブが want のときだけ）
-    if (currentTab === "want") {
-        sortedWishlists.forEach((w) => {
-            const matchesKeyword = (w.title || "").toLowerCase().includes(keyword) || (w.author || "").toLowerCase().includes(keyword);
-            if (!matchesKeyword) return;
-
-            htmlParts.push(`
-                <div class="book wishlist">
-                    <img src="${escapeHTML(w.image || "")}" alt="表紙" class="book-image" onerror="this.style.display='none'">
-                    <div class="book-info">
-                        <h3>${escapeHTML(w.title)}</h3>
-                        <p>著者：${escapeHTML(w.author)}</p>
-                        <p>出版社：${escapeHTML(w.publisher || "不明")}</p>
-                        <p>ISBN：${escapeHTML(w.isbn || "なし")}</p>
-                        ${w.price ? `<p>価格：${escapeHTML(w.price)}円</p>` : ""}
-
-                        <p>
-                            <button class="btn btn-success" onclick="purchaseWishlistItem('${w.id}')">購入済みにする</button>
-                            <button class="btn btn-danger" onclick="deleteWishlistItem('${w.id}')">削除</button>
-                        </p>
-                    </div>
-                </div>
-            `);
-        });
-    }
 
     // 次に所有本を表示（タブが all または ステータスタブのとき）
     sortedBooks.forEach((book) => {
