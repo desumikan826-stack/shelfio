@@ -25,6 +25,58 @@ import { fetchRakutenBookByIsbn, fetchSeriesVolumes } from './rakutenSearch.js';
 // シリーズ名(trim済み) → Map<巻数, 楽天APIの本情報>
 const seriesSearchCache = new Map();
 
+// 💡 二重登録チェック：ISBNが一致する本があればそれを返す。
+// ISBNが無い（比較できない）場合はタイトル＋著者の一致で判定する
+function findDuplicateBook({ isbn, title, author }) {
+    const normalizedIsbn = (isbn || "").replace(/-/g, "").trim();
+    const normalizedTitle = (title || "").trim().toLowerCase();
+    const normalizedAuthor = (author || "").trim().toLowerCase();
+
+    const all = [...books, ...wishlists];
+
+    return all.find((b) => {
+        const bIsbn = (b.isbn || "").replace(/-/g, "").trim();
+        if (normalizedIsbn && bIsbn) {
+            return normalizedIsbn === bIsbn;
+        }
+
+        const bTitle = (b.title || "").trim().toLowerCase();
+        if (!normalizedTitle || bTitle !== normalizedTitle) return false;
+        if (!normalizedAuthor) return true;
+
+        const bAuthor = (b.author || "").trim().toLowerCase();
+        return bAuthor === normalizedAuthor;
+    });
+}
+
+// 💡 読者レベル：読了済み(finished)の冊数から現在のレベルと次のレベルまでの進捗を計算する
+// Lv1〜10：10冊ごとに+1 / Lv10〜20：50冊ごとに+1 / Lv20〜100：100冊ごとに+1（Lv100で打ち止め）
+function getReaderLevelInfo(finishedCount) {
+    let level = 1;
+    let remaining = finishedCount;
+
+    const stages = [
+        { perLevel: 10, levelUps: 9 },  // Lv1 → Lv10
+        { perLevel: 50, levelUps: 10 }, // Lv10 → Lv20
+        { perLevel: 100, levelUps: 80 }, // Lv20 → Lv100
+    ];
+
+    for (const stage of stages) {
+        for (let i = 0; i < stage.levelUps; i++) {
+            if (level >= 100) break;
+            if (remaining >= stage.perLevel) {
+                remaining -= stage.perLevel;
+                level++;
+            } else {
+                return { level, progress: remaining, needed: stage.perLevel, isMax: false };
+            }
+        }
+    }
+
+    return { level, progress: remaining, needed: null, isMax: true };
+}
+
+
 // 💡 積読危険度：未読ステータスの本について、登録からの経過日数で判定
 // 10日以内→緑、10〜30日→黄、30日超→赤
 function getTsundokuRisk(book) {
@@ -412,6 +464,11 @@ export async function addBook() {
 
     if (title === "") return;
 
+    if (findDuplicateBook({ title, author })) {
+        alert("その本は登録済みです。");
+        return;
+    }
+
     const user = await getCurrentUser();
     if (!user) return;
 
@@ -478,6 +535,11 @@ export async function addBook() {
 
 export async function addRakutenBook(info) {
 
+    if (findDuplicateBook({ isbn: info.isbn, title: info.title, author: info.author })) {
+        alert("その本は登録済みです。");
+        return;
+    }
+
     const user = await getCurrentUser();
 
     const { data, error } = await supabase
@@ -508,6 +570,11 @@ export async function addRakutenBook(info) {
 }
 
 export async function addWishlistItem({ title, author, image = "", isbn = "", publisher = "", publish_date = "", pages = 0, price = 0, rating = 0 }) {
+    if (findDuplicateBook({ isbn, title, author })) {
+        alert("その本は登録済みです。");
+        return;
+    }
+
     const user = await getCurrentUser();
     if (!user) return;
 
@@ -633,6 +700,30 @@ export function displayBooks() {
         📊 読了率（所有）：${rate}%　
         📦 積読増減(今月)：${monthlyChangeLabel}冊
         `;
+
+        const levelContainer = document.getElementById("readerLevel");
+        if (levelContainer) {
+            const levelInfo = getReaderLevelInfo(finished);
+            const percent = levelInfo.isMax
+                ? 100
+                : Math.round((levelInfo.progress / levelInfo.needed) * 100);
+
+            levelContainer.innerHTML = `
+                <div class="reader-level-card">
+                    <div class="reader-level-badge">🏅 Lv.${levelInfo.level}</div>
+                    <div class="reader-level-detail">
+                        ${levelInfo.isMax
+                            ? `<p>最高レベルに到達しています！（読了 ${finished}冊）</p>`
+                            : `
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar-fill" style="width:${percent}%;"></div>
+                                </div>
+                                <p>次のレベルまであと ${levelInfo.needed - levelInfo.progress}冊（${levelInfo.progress}/${levelInfo.needed}）</p>
+                            `}
+                    </div>
+                </div>
+            `;
+        }
     }
 
     list.innerHTML = "";
