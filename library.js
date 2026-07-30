@@ -566,7 +566,45 @@ export async function addRakutenBook(info) {
 
     await loadBooks();
 
-    alert("登録しました");
+    alert("ほしい本として登録しました");
+}
+
+// 💡 検索結果を「購入済みの本」として本棚（books）に直接登録する
+export async function addRakutenBookAsPurchased(info) {
+
+    if (findDuplicateBook({ isbn: info.isbn, title: info.title, author: info.author })) {
+        alert("その本は登録済みです。");
+        return;
+    }
+
+    const user = await getCurrentUser();
+
+    const { error } = await supabase
+        .from("books")
+        .insert({
+        user_id: user.id,
+        title: info.title,
+        author: info.author,
+        image: info.largeImageUrl || "",
+        isbn: info.isbn || "",
+        publisher: info.publisherName || "",
+        publish_date: info.salesDate || "",
+        pages: 0,
+        price: Number(info.itemPrice) || 0,
+        rating: 0,
+        purchased: true,
+        status: "unread"
+    });
+
+    if (error) {
+        console.error(error);
+        alert("本の登録に失敗しました。もう一度お試しください。");
+        return;
+    }
+
+    await loadBooks();
+
+    alert("購入済みの本として登録しました");
 }
 
 export async function addWishlistItem({ title, author, image = "", isbn = "", publisher = "", publish_date = "", pages = 0, price = 0, rating = 0 }) {

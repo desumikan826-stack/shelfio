@@ -6,7 +6,7 @@ import {
     setSearchResults,
     setCurrentSearchPage,
 } from './state.js';
-import { addRakutenBook } from './library.js';
+import { addRakutenBook, addRakutenBookAsPurchased } from './library.js';
 
 // 楽天ブックスAPIの結果を、共通の形（title, author, isbnなど）に揃えて返す
 export async function fetchRakutenResults(keyword, searchType) {
@@ -159,12 +159,22 @@ export function renderSearchPage() {
             ${info.itemUrl ? `<p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(info.itemUrl)}" target="_blank" rel="noopener noreferrer">🛒 楽天ブックスで購入</a></p>` : ""}
         `;
 
-        const button = document.createElement("button");
-        button.className = "btn btn-primary";
-        button.textContent = "登録";
-        button.onclick = () => addRakutenBook(info);
+        const registerRow = document.createElement("p");
 
-        div.appendChild(button);
+        const wishlistButton = document.createElement("button");
+        wishlistButton.className = "btn btn-primary";
+        wishlistButton.textContent = "💖 ほしい本として登録";
+        wishlistButton.onclick = () => addRakutenBook(info);
+
+        const purchasedButton = document.createElement("button");
+        purchasedButton.className = "btn btn-success";
+        purchasedButton.textContent = "✅ 購入済みとして登録";
+        purchasedButton.onclick = () => addRakutenBookAsPurchased(info);
+
+        registerRow.appendChild(wishlistButton);
+        registerRow.appendChild(purchasedButton);
+
+        div.appendChild(registerRow);
         result.appendChild(div);
     });
 
