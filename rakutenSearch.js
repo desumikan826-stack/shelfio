@@ -6,7 +6,7 @@ import {
     setSearchResults,
     setCurrentSearchPage,
 } from './state.js';
-import { addRakutenBook, addRakutenBookAsPurchased } from './library.js';
+import { addRakutenBook, addRakutenBookAsPurchased, findDuplicateBook } from './library.js';
 
 // 楽天ブックスAPIの結果を、共通の形（title, author, isbnなど）に揃えて返す
 export async function fetchRakutenResults(keyword, searchType) {
@@ -123,7 +123,12 @@ export async function searchBook() {
 
     try {
         const items = await fetchRakutenResults(keyword, searchType);
-        displaySearchResult(items);
+        const newItems = items.filter((item) => !findDuplicateBook({
+            isbn: item.isbn,
+            title: item.title,
+            author: item.author,
+        }));
+        displaySearchResult(newItems);
 
     } catch (e) {
         console.error(e);
@@ -143,6 +148,11 @@ export function renderSearchPage() {
     if (!result) return;
 
     result.innerHTML = "";
+
+    if (!allSearchResults.length) {
+        result.innerHTML = `<div class="empty-state">🔍 <p>登録済みの本を除いて、該当する本が見つかりませんでした。</p></div>`;
+        return;
+    }
 
     const start = (currentSearchPage - 1) * RESULTS_PER_PAGE;
     const pageItems = allSearchResults.slice(start, start + RESULTS_PER_PAGE);

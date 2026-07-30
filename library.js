@@ -27,7 +27,7 @@ const seriesSearchCache = new Map();
 
 // 💡 二重登録チェック：ISBNが一致する本があればそれを返す。
 // ISBNが無い（比較できない）場合はタイトル＋著者の一致で判定する
-function findDuplicateBook({ isbn, title, author }) {
+export function findDuplicateBook({ isbn, title, author }) {
     const normalizedIsbn = (isbn || "").replace(/-/g, "").trim();
     const normalizedTitle = (title || "").trim().toLowerCase();
     const normalizedAuthor = (author || "").trim().toLowerCase();
