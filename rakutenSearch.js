@@ -75,41 +75,6 @@ export async function fetchRakutenBookByIsbn(isbn) {
     };
 }
 
-// 💡 タイトルの数字部分を巻数として取り出す（例:「〇〇 3」「〇〇(3)」「〇〇 第3巻」）
-function extractVolumeNumber(title, seriesName) {
-    let rest = title;
-    if (seriesName && rest.startsWith(seriesName)) {
-        rest = rest.slice(seriesName.length);
-    }
-
-    const match = rest.match(/(\d+)/);
-    if (!match) return null;
-
-    const volume = Number(match[1]);
-    return Number.isInteger(volume) && volume > 0 ? volume : null;
-}
-
-// 💡 シリーズ名で楽天ブックスAPIを検索し、巻数ごとの本情報をMapで返す（巻数 → {isbn, title, ...}）
-export async function fetchSeriesVolumes(seriesName) {
-    const items = await fetchRakutenResults(seriesName, "title");
-    const volumeMap = new Map();
-
-    items.forEach((item) => {
-        // シリーズ名そのものを含まないタイトルは別作品の可能性が高いので除外
-        if (!item.title || !item.title.includes(seriesName)) return;
-
-        const volume = extractVolumeNumber(item.title, seriesName);
-        if (volume === null) return;
-
-        // 同じ巻数が複数回ヒットした場合は最初に見つかったものを優先
-        if (!volumeMap.has(volume)) {
-            volumeMap.set(volume, item);
-        }
-    });
-
-    return volumeMap;
-}
-
 export async function searchBook() {
     const input = document.getElementById("bookSearch");
     if (!input) return;

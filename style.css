@@ -79,7 +79,7 @@ a{
     gap: 10px;
 }
 
-input, select{
+input, select, textarea{
     padding:9px 10px;
     margin-right:10px;
     font-family: var(--font-body);
@@ -712,23 +712,12 @@ nav a:hover{
     transition: width .2s ease;
 }
 
-.volume-badge {
-    display: inline-block;
-    padding: 3px 9px;
-    margin: 2px 4px 2px 0;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.volume-badge.owned {
-    background: #DDEEE1;
-    color: var(--color-success);
-}
-
-.volume-badge.missing {
-    background: #F5DFDA;
-    color: var(--color-danger);
+.review-textarea {
+    width: 100%;
+    min-height: 100px;
+    line-height: 1.6;
+    resize: vertical;
+    margin-bottom: 10px;
 }
 
 .stats-section {

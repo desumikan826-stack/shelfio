@@ -19,8 +19,7 @@ import {
     deleteBook,
     togglePurchased,
     updateReadingProgress,
-    updateSeriesInfo,
-    searchSeriesVolumes,
+    updateReview,
     updateCollection,
     createCollection,
     initCollectionFilter,
@@ -49,8 +48,7 @@ window.deleteBook = deleteBook;
 window.changeRating = changeRating;
 window.togglePurchased = togglePurchased;
 window.updateReadingProgress = updateReadingProgress;
-window.updateSeriesInfo = updateSeriesInfo;
-window.searchSeriesVolumes = searchSeriesVolumes;
+window.updateReview = updateReview;
 window.updateCollection = updateCollection;
 window.createCollection = createCollection;
 window.changeStatus = changeStatus;

@@ -17,11 +17,7 @@ import {
 } from './state.js';
 import { renderSchedulePage } from './schedule.js';
 import { renderStatsPage, getMonthlyTsundokuChange } from './stats.js';
-import { fetchRakutenBookByIsbn, fetchSeriesVolumes } from './rakutenSearch.js';
-
-// 💡 シリーズ検索結果のキャッシュ（ページ内のみ有効・DBには保存しない）
-// シリーズ名(trim済み) → Map<巻数, 楽天APIの本情報>
-const seriesSearchCache = new Map();
+import { fetchRakutenBookByIsbn } from './rakutenSearch.js';
 
 // 💡 二重登録チェック：ISBNが一致する本があればそれを返す。
 // ISBNが無い（比較できない）場合はタイトル＋著者の一致で判定する
@@ -99,73 +95,6 @@ function getReadingProgress(book) {
     const percent = Math.min(100, Math.max(0, Math.round((current / total) * 100)));
 
     return { current, total, percent };
-}
-
-// 💡 シリーズ管理：同じシリーズ名(series)が入力された本を集めて、
-// 持っている巻/足りない巻を判定する。
-// API検索済み（seriesSearchCacheにある）ならISBN一致で自動判定、
-// 未検索ならこれまで通り手動入力(volume/series_total_volumes)で判定する
-function getSeriesVolumeStatus(book) {
-    const seriesName = (book.series || "").trim();
-    if (!seriesName) return null;
-
-    const seriesBooks = books.filter((b) => (b.series || "").trim() === seriesName);
-    const ownedIsbns = new Set(
-        seriesBooks.map((b) => (b.isbn || "").replace(/-/g, "")).filter(Boolean)
-    );
-    const ownedVolumesManual = new Set(
-        seriesBooks
-            .map((b) => Number(b.volume))
-            .filter((v) => Number.isInteger(v) && v > 0)
-    );
-
-    const apiVolumes = seriesSearchCache.get(seriesName);
-
-    if (apiVolumes && apiVolumes.size) {
-        const volumeNumbers = [...apiVolumes.keys()].sort((a, b) => a - b);
-        const ownedVolumes = [];
-        const missingVolumes = [];
-
-        volumeNumbers.forEach((v) => {
-            const item = apiVolumes.get(v);
-            const isbn = (item.isbn || "").replace(/-/g, "");
-            const isOwned = (isbn && ownedIsbns.has(isbn)) || ownedVolumesManual.has(v);
-            (isOwned ? ownedVolumes : missingVolumes).push(v);
-        });
-
-        return {
-            seriesName,
-            ownedVolumes,
-            missingVolumes,
-            totalVolumes: volumeNumbers.length ? volumeNumbers[volumeNumbers.length - 1] : 0,
-            totalKnown: true,
-            source: "api",
-        };
-    }
-
-    const ownedVolumes = [...ownedVolumesManual].sort((a, b) => a - b);
-
-    const totalVolumes = Math.max(
-        Number(book.series_total_volumes) || 0,
-        ownedVolumes.length ? ownedVolumes[ownedVolumes.length - 1] : 0
-    );
-
-    const missingVolumes = [];
-    if (totalVolumes > 0) {
-        const ownedSet = new Set(ownedVolumes);
-        for (let v = 1; v <= totalVolumes; v++) {
-            if (!ownedSet.has(v)) missingVolumes.push(v);
-        }
-    }
-
-    return {
-        seriesName,
-        ownedVolumes,
-        missingVolumes,
-        totalVolumes,
-        totalKnown: Number(book.series_total_volumes) > 0,
-        source: "manual",
-    };
 }
 
 // ---- フォルダ（コレクション） ----
@@ -839,7 +768,6 @@ async function renderBookDetailView() {
 
     const risk = getTsundokuRisk(book);
     const progress = getReadingProgress(book);
-    const seriesStatus = getSeriesVolumeStatus(book);
 
     const currentCollection = (book.collection || "").trim();
     const knownCollections = await getKnownCollectionNames();
@@ -885,37 +813,11 @@ async function renderBookDetailView() {
                     ` : ""}
 
                     <div class="reading-progress">
-                        <p class="reading-progress-title">シリーズ管理</p>
+                        <p class="reading-progress-title">感想</p>
+                        <textarea id="reviewInput-${book.id}" class="review-textarea" placeholder="読んだ感想を自由に書いてください">${escapeHTML(book.review || "")}</textarea>
                         <p class="reading-progress-inputs">
-                            <label>シリーズ名
-                                <input type="text" id="seriesNameInput-${book.id}" placeholder="例：薬屋のひとりごと" value="${escapeHTML(book.series || "")}">
-                            </label>
-                            <button id="seriesSearchBtn-${book.id}" class="btn btn-primary" onclick="searchSeriesVolumes('${book.id}')">🔍 API検索で自動判定</button>
+                            <button class="btn btn-primary" onclick="updateReview('${book.id}')">感想を保存</button>
                         </p>
-                        <p class="reading-progress-inputs">
-                            <label>この本の巻数（手動、任意）
-                                <input type="number" id="seriesVolumeInput-${book.id}" min="1" value="${book.volume || ""}">
-                            </label>
-                            <label>全巻数（手動、わかれば）
-                                <input type="number" id="seriesTotalInput-${book.id}" min="1" value="${book.series_total_volumes || ""}">
-                            </label>
-                            <button class="btn btn-secondary" onclick="updateSeriesInfo('${book.id}')">手動情報を保存</button>
-                        </p>
-                        ${seriesStatus ? `
-                            <p class="no-rating">${seriesStatus.source === "api" ? "🔍 API検索結果をもとに自動判定しています" : "✍️ 手動入力をもとに判定しています（API検索するとISBNで自動判定されます）"}</p>
-                            <p>
-                                持っている巻：${seriesStatus.ownedVolumes.length
-                                    ? seriesStatus.ownedVolumes.map((v) => `<span class="volume-badge owned">${v}巻</span>`).join("")
-                                    : "なし"}
-                            </p>
-                            ${seriesStatus.totalKnown ? `
-                                <p>
-                                    足りない巻：${seriesStatus.missingVolumes.length
-                                        ? seriesStatus.missingVolumes.map((v) => `<span class="volume-badge missing">${v}巻</span>`).join("")
-                                        : "ありません（コンプリート！）"}
-                                </p>
-                            ` : `<p class="no-rating">全巻数を入力すると、足りない巻がわかります。</p>`}
-                        ` : `<p class="no-rating">シリーズ名を入力すると、持っている巻・足りない巻が表示されます。</p>`}
                     </div>
 
                     <div class="reading-progress">
@@ -1010,70 +912,24 @@ export async function updateReadingProgress(bookId) {
     await loadBooks();
 }
 
-export async function searchSeriesVolumes(bookId) {
-    const book = books.find((b) => String(b.id) === String(bookId));
-    if (!book) return;
-
-    const seriesInput = document.getElementById(`seriesNameInput-${bookId}`);
-    const seriesName = (seriesInput?.value || book.series || "").trim();
-
-    if (!seriesName) {
-        alert("シリーズ名を入力してから検索してください。");
-        return;
-    }
-
-    const searchBtn = document.getElementById(`seriesSearchBtn-${bookId}`);
-    if (searchBtn) searchBtn.disabled = true;
-
-    try {
-        const volumeMap = await fetchSeriesVolumes(seriesName);
-
-        if (!volumeMap.size) {
-            alert("該当するシリーズが見つかりませんでした。シリーズ名を見直してもう一度お試しください。");
-            return;
-        }
-
-        seriesSearchCache.set(seriesName, volumeMap);
-
-        // シリーズ名を確定させる（未保存だった場合はここで保存する）
-        if (seriesName !== (book.series || "").trim()) {
-            await supabase.from("books").update({ series: seriesName }).eq("id", bookId);
-            await loadBooks();
-        } else {
-            displayBooks();
-        }
-    } catch (e) {
-        console.error(e);
-        alert("シリーズの検索に失敗しました。もう一度お試しください。");
-    } finally {
-        if (searchBtn) searchBtn.disabled = false;
-    }
-}
-
-export async function updateSeriesInfo(bookId) {
-    const seriesInput = document.getElementById(`seriesNameInput-${bookId}`);
-    const volumeInput = document.getElementById(`seriesVolumeInput-${bookId}`);
-    const totalInput = document.getElementById(`seriesTotalInput-${bookId}`);
-
-    const series = seriesInput?.value.trim() || null;
-    const volumeRaw = volumeInput?.value;
-    const totalRaw = totalInput?.value;
-
-    const volume = volumeRaw ? Math.max(0, Number(volumeRaw) || 0) : null;
-    const seriesTotalVolumes = totalRaw ? Math.max(0, Number(totalRaw) || 0) : null;
+// 💡 本の詳細画面の「感想」欄から呼ばれる
+export async function updateReview(bookId) {
+    const textarea = document.getElementById(`reviewInput-${bookId}`);
+    const review = (textarea?.value || "").trim() || null;
 
     const { error } = await supabase
         .from("books")
-        .update({ series, volume, series_total_volumes: seriesTotalVolumes })
+        .update({ review })
         .eq("id", bookId);
 
     if (error) {
         console.error(error);
-        alert("シリーズ情報の更新に失敗しました。もう一度お試しください。");
+        alert("感想の保存に失敗しました。もう一度お試しください。");
         return;
     }
 
     await loadBooks();
+    alert("感想を保存しました");
 }
 
 export async function togglePurchased(bookId) {
