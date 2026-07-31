@@ -1173,9 +1173,18 @@ export async function togglePurchased(bookId) {
 }
 
 export async function changeStatus(bookId, status) {
+    const updates = { status, updated_at: new Date().toISOString() };
+
+    if (status === "reading") {
+        updates.started_at = new Date().toISOString();
+    }
+    if (status === "finished") {
+        updates.finished_at = new Date().toISOString();
+    }
+
     const { error } = await supabase
         .from("books")
-        .update({ status, updated_at: new Date().toISOString() })
+        .update(updates)
         .eq("id", bookId);
 
     if (error) {

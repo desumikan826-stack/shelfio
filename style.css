@@ -748,6 +748,77 @@ nav a:hover{
     margin: 0 auto;
 }
 
+/* 読書タイムライン */
+.timeline {
+    position: relative;
+    padding-left: 26px;
+}
+
+.timeline::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--color-border);
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -26px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+
+.timeline-item.timeline-finish .timeline-marker {
+    border-color: var(--color-success);
+}
+
+.timeline-item.timeline-start .timeline-marker {
+    border-color: var(--color-info);
+}
+
+.timeline-content {
+    background: var(--color-surface-soft);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    flex: 1;
+}
+
+.timeline-date {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-ink-soft);
+}
+
+.timeline-title {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+
+.timeline-author {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--color-ink-soft);
+}
+
 /* ハンバーガーメニュー（その他） */
 .hamburger-btn {
     background: rgba(255, 255, 255, 0.15);
