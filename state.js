@@ -17,7 +17,6 @@ export let detailWishlistId = null; // 💡 タップして詳細表示してい
 export let currentRating = 0;
 
 export let currentCollectionFilter = null; // 💡 フォルダ絞り込み。null=すべて、"__uncategorized__"=未分類、それ以外はフォルダ名
-export let currentTagFilter = null; // 💡 タグ絞り込み。nullなら絞り込みなし
 
 export function setBooks(list) {
     books = list;
@@ -46,10 +45,6 @@ export function setCurrentRating(rating) {
 
 export function setCurrentCollectionFilter(value) {
     currentCollectionFilter = value;
-}
-
-export function setCurrentTagFilter(value) {
-    currentTagFilter = value;
 }
 
 export function setSearchResults(items) {

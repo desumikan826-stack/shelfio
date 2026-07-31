@@ -22,8 +22,8 @@ import {
     updateSeriesInfo,
     searchSeriesVolumes,
     updateCollection,
-    addTag,
-    removeTag,
+    createCollection,
+    initCollectionFilter,
     changeStatus,
     toggleStatusMenu,
     switchTab,
@@ -52,8 +52,7 @@ window.updateReadingProgress = updateReadingProgress;
 window.updateSeriesInfo = updateSeriesInfo;
 window.searchSeriesVolumes = searchSeriesVolumes;
 window.updateCollection = updateCollection;
-window.addTag = addTag;
-window.removeTag = removeTag;
+window.createCollection = createCollection;
 window.changeStatus = changeStatus;
 window.displayBooks = displayBooks;
 window.addScheduleItem = addScheduleItem;
@@ -82,4 +81,5 @@ initAuthForm();
 initLogout();
 initSearchPage();
 initSideMenu();
+initCollectionFilter();
 guardProtectedPages(getCurrentUser);

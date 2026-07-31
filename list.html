@@ -60,9 +60,6 @@
     </button>
 </div>
 
-<div id="collectionTabs" class="tabs"></div>
-<div id="tagFilterBar" class="tabs tag-filter-bar"></div>
-
 <!-- もともとある検索バー -->
 
 <div class="search">
@@ -78,6 +75,9 @@
         id="search"
         placeholder="本を検索..."
         onkeyup="displayBooks()">
+
+    <select id="collectionSelect"></select>
+    <button type="button" class="btn btn-secondary" onclick="createCollection()">＋ 新規フォルダ</button>
 
 </div>
 

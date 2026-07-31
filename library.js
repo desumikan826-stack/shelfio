@@ -7,7 +7,6 @@ import {
     detailWishlistId,
     currentRating,
     currentCollectionFilter,
-    currentTagFilter,
     setBooks,
     setWishlists,
     setCurrentTab,
@@ -15,7 +14,6 @@ import {
     setDetailWishlistId,
     setCurrentRating,
     setCurrentCollectionFilter,
-    setCurrentTagFilter,
 } from './state.js';
 import { renderSchedulePage } from './schedule.js';
 import { renderStatsPage, getMonthlyTsundokuChange } from './stats.js';
@@ -170,93 +168,96 @@ function getSeriesVolumeStatus(book) {
     };
 }
 
-// ---- タグ / フォルダ（コレクション） ----
+// ---- フォルダ（コレクション） ----
+// 💡 本に付いているフォルダ名(collection)に加えて、
+// まだどの本にも付いていない「作成だけ済ませたフォルダ」もlocalStorageに保存しておく
+function getCollectionStorageKey(userId) {
+    return `shelfio-collections-${userId}`;
+}
+
 function getDistinctCollections() {
     const set = new Set();
     books.forEach((b) => {
         const c = (b.collection || "").trim();
         if (c) set.add(c);
     });
-    return [...set].sort((a, b) => a.localeCompare(b, "ja"));
+    return set;
 }
 
-function getDistinctTags() {
-    const set = new Set();
-    books.forEach((b) => {
-        (b.tags || []).forEach((t) => {
-            const trimmed = (t || "").trim();
-            if (trimmed) set.add(trimmed);
-        });
-    });
-    return [...set].sort((a, b) => a.localeCompare(b, "ja"));
-}
+async function getKnownCollectionNames() {
+    const fromBooks = getDistinctCollections();
 
-// 💡 フォルダ絞り込みタブを描画する（list.html の #collectionTabs のみで動作）
-function renderCollectionTabs() {
-    const container = document.getElementById("collectionTabs");
-    if (!container) return;
+    const user = await getCurrentUser();
+    if (!user) return [...fromBooks].sort((a, b) => a.localeCompare(b, "ja"));
 
-    const collections = getDistinctCollections();
-    const hasUncategorized = books.some((b) => !(b.collection || "").trim());
-
-    const options = [{ value: null, label: "📁 すべて" }];
-    collections.forEach((c) => options.push({ value: c, label: c }));
-    if (hasUncategorized) options.push({ value: "__uncategorized__", label: "未分類" });
-
-    container.innerHTML = options
-        .map((opt, i) => `
-            <button type="button" class="tab-btn ${currentCollectionFilter === opt.value ? "active" : ""}" data-collection-index="${i}">
-                ${escapeHTML(opt.label)}
-            </button>
-        `)
-        .join("") + `
-        <datalist id="collectionOptions">
-            ${collections.map((c) => `<option value="${escapeHTML(c)}"></option>`).join("")}
-        </datalist>
-    `;
-
-    container.querySelectorAll("button[data-collection-index]").forEach((btn, i) => {
-        btn.addEventListener("click", () => {
-            setCurrentCollectionFilter(options[i].value);
-            displayBooks();
-            renderCollectionTabs();
-        });
-    });
-}
-
-// 💡 タグ絞り込みバーを描画する（list.html の #tagFilterBar のみで動作）
-function renderTagFilterBar() {
-    const container = document.getElementById("tagFilterBar");
-    if (!container) return;
-
-    const tags = getDistinctTags();
-    if (!tags.length) {
-        container.innerHTML = "";
-        return;
+    let stored = [];
+    try {
+        const raw = window.localStorage.getItem(getCollectionStorageKey(user.id));
+        stored = raw ? JSON.parse(raw) : [];
+    } catch {
+        stored = [];
     }
 
-    const options = [{ value: null, label: "すべて" }, ...tags.map((t) => ({ value: t, label: `#${t}` }))];
+    const merged = new Set([...stored, ...fromBooks]);
+    return [...merged].sort((a, b) => a.localeCompare(b, "ja"));
+}
 
-    container.innerHTML = options
-        .map((opt, i) => `
-            <button type="button" class="tag-filter-btn ${currentTagFilter === opt.value ? "active" : ""}" data-tag-index="${i}">
-                ${escapeHTML(opt.label)}
-            </button>
-        `)
+async function saveKnownCollectionNames(names) {
+    const user = await getCurrentUser();
+    if (!user) return;
+    window.localStorage.setItem(getCollectionStorageKey(user.id), JSON.stringify(names));
+}
+
+// 💡 検索バーの右にあるフォルダ絞り込みセレクトを描画する（list.html の #collectionSelect のみで動作）
+async function renderCollectionSelect() {
+    const select = document.getElementById("collectionSelect");
+    if (!select) return;
+
+    const names = await getKnownCollectionNames();
+    const hasUncategorized = books.some((b) => !(b.collection || "").trim());
+
+    const options = [{ value: "", label: "📁 すべてのフォルダ" }];
+    names.forEach((n) => options.push({ value: n, label: n }));
+    if (hasUncategorized) options.push({ value: "__uncategorized__", label: "未分類" });
+
+    select.innerHTML = options
+        .map((opt) => `<option value="${escapeHTML(opt.value)}">${escapeHTML(opt.label)}</option>`)
         .join("");
 
-    container.querySelectorAll("button[data-tag-index]").forEach((btn, i) => {
-        btn.addEventListener("click", () => {
-            setCurrentTagFilter(options[i].value);
-            displayBooks();
-            renderTagFilterBar();
-        });
+    select.value = currentCollectionFilter || "";
+}
+
+// 💡 検索バー右の「＋新規フォルダ」ボタンから呼ばれる。名前を入力するだけでフォルダが作れる
+export async function createCollection() {
+    const name = window.prompt("新しいフォルダの名前を入力してください（例：ラノベ、漫画、技術書）");
+    if (!name || !name.trim()) return;
+
+    const trimmed = name.trim();
+    const known = await getKnownCollectionNames();
+
+    if (!known.some((n) => n.toLowerCase() === trimmed.toLowerCase())) {
+        await saveKnownCollectionNames([...known, trimmed]);
+    }
+
+    setCurrentCollectionFilter(trimmed);
+    await renderCollectionSelect();
+    displayBooks();
+}
+
+// 💡 #collectionSelect の変更イベントを一度だけ紐づける（main.js から起動時に1回呼ぶ）
+export function initCollectionFilter() {
+    const select = document.getElementById("collectionSelect");
+    if (!select) return;
+
+    select.addEventListener("change", () => {
+        setCurrentCollectionFilter(select.value || null);
+        displayBooks();
     });
 }
 
-export async function updateCollection(bookId) {
-    const collectionInput = document.getElementById(`collectionInput-${bookId}`);
-    const collection = collectionInput?.value.trim() || null;
+// 💡 本の詳細画面のフォルダ選択セレクトから呼ばれる（選択するだけで自動保存）
+export async function updateCollection(bookId, value) {
+    const collection = (value || "").trim() || null;
 
     const { error } = await supabase
         .from("books")
@@ -270,67 +271,6 @@ export async function updateCollection(bookId) {
     }
 
     await loadBooks();
-}
-
-export async function addTag(bookId) {
-    const input = document.getElementById(`newTagInput-${bookId}`);
-    const raw = (input?.value || "").trim().replace(/^#/, "");
-    if (!raw) return;
-
-    const book = books.find((b) => String(b.id) === String(bookId));
-    if (!book) return;
-
-    const existingTags = book.tags || [];
-    if (existingTags.some((t) => t.toLowerCase() === raw.toLowerCase())) {
-        if (input) input.value = "";
-        return; // 同じタグは重複追加しない
-    }
-
-    const newTags = [...existingTags, raw];
-
-    const { error } = await supabase
-        .from("books")
-        .update({ tags: newTags })
-        .eq("id", bookId);
-
-    if (error) {
-        console.error(error);
-        alert("タグの追加に失敗しました。もう一度お試しください。");
-        return;
-    }
-
-    await loadBooks();
-}
-
-export async function removeTag(bookId, tag) {
-    const book = books.find((b) => String(b.id) === String(bookId));
-    if (!book) return;
-
-    const newTags = (book.tags || []).filter((t) => t !== tag);
-
-    const { error } = await supabase
-        .from("books")
-        .update({ tags: newTags })
-        .eq("id", bookId);
-
-    if (error) {
-        console.error(error);
-        alert("タグの削除に失敗しました。もう一度お試しください。");
-        return;
-    }
-
-    await loadBooks();
-}
-
-// 💡 タグ削除ボタン（✕）にイベントを紐づける。タグ文字列に引用符などが含まれても安全なように
-// inline onclick ではなく data属性 + addEventListener で処理する
-function bindTagRemoveButtons(container) {
-    if (!container) return;
-    container.querySelectorAll(".tag-chip-remove").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            removeTag(btn.dataset.bookId, btn.dataset.tag);
-        });
-    });
 }
 
 // ---- Wishlist / migration utilities ----
@@ -440,8 +380,7 @@ export async function loadBooks() {
     }
 
     displayBooks();
-    renderCollectionTabs();
-    renderTagFilterBar();
+    await renderCollectionSelect();
     renderWishlistPage();
     renderSchedulePage();
     renderStatsPage();
@@ -783,8 +722,7 @@ export function displayBooks() {
     sortedBooks.forEach((book) => {
         const matchesKeyword =
             (book.title || "").toLowerCase().includes(keyword) ||
-            (book.author || "").toLowerCase().includes(keyword) ||
-            (book.tags || []).some((t) => (t || "").toLowerCase().includes(keyword));
+            (book.author || "").toLowerCase().includes(keyword);
 
         const matchesTab =
             currentTab === "all" || book.status === currentTab;
@@ -795,10 +733,7 @@ export function displayBooks() {
                 ? !(book.collection || "").trim()
                 : (book.collection || "").trim() === currentCollectionFilter);
 
-        const matchesTagFilter =
-            !currentTagFilter || (book.tags || []).includes(currentTagFilter);
-
-        if (!(matchesKeyword && matchesTab && matchesCollection && matchesTagFilter)) return;
+        if (!(matchesKeyword && matchesTab && matchesCollection)) return;
         const risk = getTsundokuRisk(book);
         const progress = getReadingProgress(book);
 
@@ -833,10 +768,9 @@ export function displayBooks() {
                         </div>
                     ` : ""}
 
-                    ${(book.collection || (book.tags && book.tags.length)) ? `
+                    ${book.collection ? `
                         <p class="meta-display">
-                            ${book.collection ? `<span class="collection-chip">📁 ${escapeHTML(book.collection)}</span>` : ""}
-                            ${(book.tags || []).map((t) => `<span class="tag-chip">#${escapeHTML(t)}</span>`).join("")}
+                            <span class="collection-chip">📁 ${escapeHTML(book.collection)}</span>
                         </p>
                     ` : ""}
 
@@ -906,6 +840,15 @@ async function renderBookDetailView() {
     const risk = getTsundokuRisk(book);
     const progress = getReadingProgress(book);
     const seriesStatus = getSeriesVolumeStatus(book);
+
+    const currentCollection = (book.collection || "").trim();
+    const knownCollections = await getKnownCollectionNames();
+    const collectionOptionsHtml = [
+        `<option value="">未分類</option>`,
+        ...knownCollections.map((name) =>
+            `<option value="${escapeHTML(name)}" ${name === currentCollection ? "selected" : ""}>${escapeHTML(name)}</option>`
+        ),
+    ].join("");
 
     list.innerHTML = `
         <div class="book-detail">
@@ -979,27 +922,10 @@ async function renderBookDetailView() {
                         <p class="reading-progress-title">フォルダ</p>
                         <p class="reading-progress-inputs">
                             <label>📁 フォルダ
-                                <input type="text" list="collectionOptions" id="collectionInput-${book.id}" value="${escapeHTML(book.collection || "")}" placeholder="ラノベ、漫画...">
+                                <select id="collectionSelect-${book.id}" onchange="updateCollection('${book.id}', this.value)">
+                                    ${collectionOptionsHtml}
+                                </select>
                             </label>
-                            <button class="btn btn-primary" onclick="updateCollection('${book.id}')">保存</button>
-                        </p>
-                    </div>
-
-                    <div class="reading-progress tag-editor">
-                        <p class="reading-progress-title">タグ</p>
-                        <p class="tag-chip-row">
-                            ${(book.tags && book.tags.length)
-                                ? book.tags.map((t) => `
-                                    <span class="tag-chip">
-                                        #${escapeHTML(t)}
-                                        <button type="button" class="tag-chip-remove" data-book-id="${book.id}" data-tag="${escapeHTML(t)}" aria-label="タグを削除">×</button>
-                                    </span>
-                                `).join("")
-                                : `<span class="no-rating">タグはまだありません</span>`}
-                        </p>
-                        <p class="reading-progress-inputs">
-                            <input type="text" id="newTagInput-${book.id}" placeholder="新しいタグ（例：積読）" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag('${book.id}');}">
-                            <button type="button" class="btn btn-primary" onclick="addTag('${book.id}')">＋ タグ追加</button>
                         </p>
                     </div>
 
@@ -1008,8 +934,6 @@ async function renderBookDetailView() {
             </div>
         </div>
     `;
-
-    bindTagRemoveButtons(list);
 
     const descriptionEl = document.getElementById("bookDetailDescription");
 

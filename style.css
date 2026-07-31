@@ -923,51 +923,7 @@ nav a:hover{
     color: var(--color-primary);
 }
 
-/* フォルダ（コレクション）絞り込み・タグ絞り込み・タグチップ */
-.tag-filter-bar {
-    background: transparent;
-    padding: 0;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.tag-filter-btn {
-    padding: 6px 14px;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-ink-soft);
-    font-size: 13px;
-    font-weight: 600;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
-}
-
-.tag-filter-btn:hover {
-    border-color: var(--color-accent);
-}
-
-.tag-filter-btn.active {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-    color: white;
-}
-
-.tag-chip-row {
-    margin: 6px 0;
-}
-
-.tag-chip {
-    display: inline-block;
-    padding: 3px 10px;
-    margin: 2px 4px 2px 0;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-    background: #F1E6D2;
-    color: var(--color-accent);
-}
-
+/* フォルダ（コレクション）表示 */
 .meta-display {
     margin: 8px 0;
 }
@@ -981,47 +937,6 @@ nav a:hover{
     font-weight: 600;
     background: #E4EBF1;
     color: var(--color-primary);
-}
-
-.tag-chip-remove {
-    border: none;
-    background: none;
-    padding: 0;
-    margin-left: 6px;
-    color: var(--color-accent);
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 13px;
-    line-height: 1;
-}
-
-.tag-chip-remove:hover {
-    color: var(--color-danger);
-}
-
-.tag-editor {
-    margin: 10px 0;
-}
-
-.meta-editor {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 10px;
-    margin: 10px 0;
-}
-
-.meta-editor label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 13px;
-    color: var(--color-ink-soft);
-}
-
-.meta-editor input {
-    min-width: 160px;
-    margin-right: 0;
 }
 
 /* ============================================================
@@ -1111,7 +1026,7 @@ nav a:hover{
         width: 90px;
     }
 
-    .tabs, .tag-filter-bar{
+    .tabs{
         width: 100%;
         overflow-x: auto;
         justify-content: flex-start;
@@ -1128,15 +1043,13 @@ nav a:hover{
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .reading-progress-inputs,
-    .meta-editor{
+    .reading-progress-inputs{
         flex-direction: column;
         align-items: stretch;
     }
 
     .reading-progress-inputs input,
-    .reading-progress-compact .reading-progress-inputs input,
-    .meta-editor input{
+    .reading-progress-compact .reading-progress-inputs input{
         width: 100%;
     }
 
