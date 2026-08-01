@@ -1,0 +1,350 @@
+.rakuten-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--color-ink-soft);
+    font-size: 32px;
+    background: var(--color-surface-soft);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.empty-state p {
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+.book{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+
+    background: var(--color-surface);
+    padding:20px;
+    margin:15px 0;
+
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    border-left: 6px solid var(--color-border);
+    transition: box-shadow .15s ease;
+}
+
+.book:hover{
+    box-shadow: var(--shadow-card-hover);
+}
+
+.book.wishlist{
+    border-left-color: var(--color-wishlist);
+}
+
+.book.status-unread{
+    border-left-color: var(--color-warning);
+}
+
+.book.status-reading{
+    border-left-color: var(--color-info);
+}
+
+.book.status-finished{
+    border-left-color: var(--color-success);
+}
+
+.book-image{
+    width:120px;
+    aspect-ratio: 3 / 4.25;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    flex-shrink:0;
+    box-shadow: 0 2px 6px rgba(43, 38, 32, .18);
+    background: var(--color-surface-soft);
+}
+
+.book-info{
+    flex:1;
+}
+
+.book-info h3{
+    margin-top:0;
+    margin-bottom:10px;
+    font-size: 19px;
+}
+
+.star{
+    font-size:24px;
+    color: var(--color-accent);
+    cursor:pointer;
+    user-select:none;
+}
+
+.star:hover{
+    transform:scale(1.2);
+}
+
+.no-rating{
+    color: var(--color-ink-soft);
+    margin-right:8px;
+    font-size:14px;
+}
+
+.search {
+    margin-bottom: 20px;
+}
+
+.search input {
+    width: 300px;
+    padding: 9px 10px;
+}
+
+.rating{
+    margin:15px 0;
+}
+
+.rating span{
+    font-size:30px;
+    cursor:pointer;
+    user-select:none;
+}
+
+.book-list{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:20px;
+}
+
+.book select {
+    width: 150px;
+    padding: 6px;
+    font-size: 16px;
+}
+
+.status-buttons {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 6px;
+}
+
+.status-btn {
+    padding: 4px 10px;
+    font-size: 13px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-soft);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.status-btn.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.status-wrap {
+    position: relative;
+    margin: 15px 0;
+}
+
+.status-current {
+    cursor: pointer;
+}
+
+.status-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+}
+
+.status-menu button {
+    text-align: left;
+    background: transparent;
+}
+.status-menu button:hover {
+    background: var(--color-surface-soft);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.risk-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.risk-dot.green {
+    background: var(--color-success);
+}
+
+.risk-dot.yellow {
+    background: var(--color-warning);
+}
+
+.risk-dot.red {
+    background: var(--color-danger);
+}
+
+.book-title-link {
+    cursor: pointer;
+}
+
+.book-title-link:hover {
+    text-decoration: underline;
+    color: var(--color-primary);
+}
+
+.book-detail {
+    grid-column: 1 / -1;
+}
+
+.book-detail .btn-secondary {
+    margin-bottom: 15px;
+}
+
+.book-detail-description {
+    margin-top: 12px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: var(--color-ink-soft);
+}
+
+.reading-progress {
+    margin: 15px 0;
+    padding: 12px 14px;
+    background: var(--color-surface-soft);
+    border-radius: var(--radius-md);
+}
+
+.reading-progress-compact {
+    margin: 10px 0;
+    padding: 10px 12px;
+}
+
+.reading-progress-compact .reading-progress-inputs input {
+    width: 70px;
+}
+
+.reading-progress-title {
+    margin: 0 0 8px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--color-accent);
+    text-transform: uppercase;
+}
+
+.reading-progress-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    margin: 0 0 10px;
+}
+
+.reading-progress-inputs label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--color-ink-soft);
+}
+
+.reading-progress-inputs input {
+    width: 90px;
+    margin-right: 0;
+}
+
+.progress-bar-wrap {
+    width: 100%;
+    height: 12px;
+    background: #EFE6D3;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 6px 0;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 999px;
+    transition: width .2s ease;
+}
+
+.review-textarea {
+    width: 100%;
+    min-height: 100px;
+    line-height: 1.6;
+    resize: vertical;
+    margin-bottom: 10px;
+}
+
+/* フォルダ（コレクション）表示 */
+.meta-display {
+    margin: 8px 0;
+}
+
+.collection-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    margin: 2px 6px 2px 0;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #E4EBF1;
+    color: var(--color-primary);
+}
+
+.reader-level-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 15px 0;
+    padding: 14px 18px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+
+.reader-level-badge {
+    flex-shrink: 0;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: #E4EBF1;
+    padding: 8px 16px;
+    border-radius: 999px;
+}
+
+.reader-level-detail {
+    flex: 1;
+    min-width: 160px;
+}
+
+.reader-level-detail p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: var(--color-ink-soft);
+}

@@ -1,0 +1,72 @@
+/* ============================================================
+   Shelfio — デザイントークン
+   「私設図書館の蔵書カード」をコンセプトに、
+   温かい紙の質感 × 深いネイビー × 真鍮色のアクセントでまとめる
+   ============================================================ */
+:root{
+    --color-bg: #F7F1E4;
+    --color-surface: #FFFFFF;
+    --color-surface-soft: #FBF6EA;
+    --color-ink: #2B2620;
+    --color-ink-soft: #74695A;
+    --color-border: #E6DBC3;
+
+    --color-primary: #21405F;
+    --color-primary-hover: #16304A;
+    --color-accent: #B4893F;
+
+    --color-success: #2F7D4F;
+    --color-success-hover: #266642;
+    --color-danger: #A6402F;
+    --color-danger-hover: #8A342A;
+    --color-warning: #C79A2A;
+    --color-info: #3D6E8C;
+    --color-wishlist: #954C63;
+
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --shadow-card: 0 6px 20px rgba(43, 38, 32, .08);
+    --shadow-card-hover: 0 10px 26px rgba(43, 38, 32, .12);
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+body{
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-ink);
+    margin: 30px;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4{
+    font-family: var(--font-display);
+    color: var(--color-ink);
+    letter-spacing: .01em;
+}
+
+main h2, body > h2{
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+a{
+    color: var(--color-primary);
+}
+
+:focus-visible{
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}

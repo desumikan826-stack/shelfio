@@ -135,7 +135,9 @@ function renderReadingCalendar(items) {
                                       .map(
                                           (item) => `
                                     <div class="calendar-item">
-                                        <strong>${escapeHTML(item.title)}</strong>
+                                        <strong>${item.link
+                                            ? `<a href="${escapeHTML(item.link)}" target="_blank" rel="noopener">${escapeHTML(item.title)}</a>`
+                                            : escapeHTML(item.title)}</strong>
                                         <div>${escapeHTML(item.frequency === "weekly" ? "週刊" : "隔週")}</div>
                                     </div>`
                                       )

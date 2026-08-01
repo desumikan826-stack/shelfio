@@ -1,0 +1,222 @@
+.login-container{
+    width:350px;
+    margin:60px auto;
+    background: var(--color-surface);
+    padding:34px 30px;
+    border-radius: var(--radius-lg);
+    text-align:center;
+    box-shadow: var(--shadow-card);
+}
+
+.login-container h2{
+    margin-bottom: 20px;
+}
+
+.login-container input{
+    width:90%;
+    margin:8px 0;
+}
+
+.auth-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+}
+
+#auth-message{
+    margin-top:15px;
+    color: var(--color-danger);
+}
+
+#bookStats {
+    margin: 15px 0;
+    padding: 12px 14px;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-weight: bold;
+}
+
+.schedule-summary,
+.schedule-form,
+.schedule-list {
+    margin-bottom: 24px;
+}
+
+.schedule-card {
+    background: var(--color-surface);
+    padding: 18px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    margin-bottom: 14px;
+}
+
+.schedule-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.schedule-form .form label {
+    display: block;
+    margin-bottom: 16px;
+}
+
+.schedule-form .form input,
+.schedule-form .form select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+}
+
+.schedule-form .form button {
+    margin-top: 10px;
+    padding: 12px 18px;
+}
+
+.reading-calendar,
+.today-updates {
+    margin-bottom: 24px;
+}
+
+.reading-calendar h2,
+.today-updates h2 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.calendar-day {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    min-height: 130px;
+}
+
+.calendar-day.today {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(33, 64, 95, .12);
+}
+
+.calendar-day-label {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.calendar-item {
+    background: var(--color-surface-soft);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    margin-bottom: 8px;
+}
+
+.calendar-item a {
+    color: var(--color-ink);
+    text-decoration: none;
+}
+
+.calendar-item a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.calendar-item.empty {
+    background: transparent;
+    color: var(--color-ink-soft);
+    margin-bottom: 0;
+}
+
+.stats-section {
+    background: var(--color-surface);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    margin-bottom: 24px;
+}
+
+.stats-section h3 {
+    margin-top: 0;
+}
+
+.chart-wrap {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* 読書タイムライン */
+.timeline {
+    position: relative;
+    padding-left: 26px;
+}
+
+.timeline::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--color-border);
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -26px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+}
+
+.timeline-item.timeline-finish .timeline-marker {
+    border-color: var(--color-success);
+}
+
+.timeline-item.timeline-start .timeline-marker {
+    border-color: var(--color-info);
+}
+
+.timeline-content {
+    background: var(--color-surface-soft);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    flex: 1;
+}
+
+.timeline-date {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-ink-soft);
+}
+
+.timeline-title {
+    margin: 4px 0 0;
+    font-weight: 600;
+}
+
+.timeline-author {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--color-ink-soft);
+}

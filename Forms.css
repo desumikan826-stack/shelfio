@@ -1,0 +1,88 @@
+.form{
+    margin-top:24px;
+    margin-bottom:20px;
+    padding: 20px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+input, select, textarea{
+    padding:9px 10px;
+    margin-right:10px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+button{
+    padding:8px 15px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: #EFE6D3;
+    color: var(--color-ink);
+    font-weight: bold;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color .15s ease, opacity .15s ease, transform .1s ease;
+}
+
+button:hover{
+    background:#E4D8BC;
+}
+
+button:disabled{
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* 💡 役割ごとに色を固定したボタン（青＝メイン、緑＝購入済み、赤＝削除、グレー＝キャンセル/戻る） */
+.btn{
+    display: inline-block;
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color .15s ease, opacity .15s ease;
+}
+
+.btn-primary{
+    background: var(--color-primary);
+    color: white;
+}
+.btn-primary:hover{
+    background: var(--color-primary-hover);
+}
+
+.btn-success{
+    background: var(--color-success);
+    color: white;
+}
+.btn-success:hover{
+    background: var(--color-success-hover);
+}
+
+.btn-danger{
+    background: var(--color-danger);
+    color: white;
+}
+.btn-danger:hover{
+    background: var(--color-danger-hover);
+}
+
+.btn-secondary{
+    background: #EFE6D3;
+    color: var(--color-ink);
+}
+.btn-secondary:hover{
+    background: #E4D8BC;
+}
