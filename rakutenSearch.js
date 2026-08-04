@@ -9,13 +9,17 @@ import {
 import { addRakutenBook, addRakutenBookAsPurchased, findDuplicateBook } from './library.js';
 
 // 楽天ブックスAPIの結果を、共通の形（title, author, isbnなど）に揃えて返す
-export async function fetchRakutenResults(keyword, searchType) {
+// 💡 genreId を指定すると、そのジャンル（例：漫画=001001、ライトノベル=001017）に絞り込んで検索する
+// ※ Supabase Edge Function 側（rakuten-search）でも genreId を受け取って
+//    楽天APIの booksGenreId パラメータに渡すよう対応している必要があります
+export async function fetchRakutenResults(keyword, searchType, genreId = "") {
     const allItems = [];
-    const MAX_PAGES = 4; // 30件 × 4ページ = 最大120件取得(100件で切る)
+    const MAX_PAGES = 10; // 30件 × 10ページ = 最大300件取得
+    const MAX_RESULTS = 300;
 
     for (let page = 1; page <= MAX_PAGES; page++) {
         const { data, error } = await supabase.functions.invoke("rakuten-search", {
-            body: { keyword, searchType, page },
+            body: { keyword, searchType, genreId, page },
         });
 
         if (error) {
@@ -43,8 +47,8 @@ export async function fetchRakutenResults(keyword, searchType) {
         // その回の結果が30件未満なら、もうページが無いので終了
         if (items.length < 30) break;
 
-        // 100件集まったら十分なので終了
-        if (allItems.length >= 100) break;
+        // 上限まで集まったら十分なので終了
+        if (allItems.length >= MAX_RESULTS) break;
 
         // 楽天APIのレート制限に配慮して少し間隔を空ける
         if (page < MAX_PAGES) {
@@ -52,7 +56,7 @@ export async function fetchRakutenResults(keyword, searchType) {
         }
     }
 
-    return allItems.slice(0, 100);
+    return allItems.slice(0, MAX_RESULTS);
 }
 
 // 💡 ISBNで楽天ブックスAPIを1件だけ検索し、あらすじ(itemCaption)を取得する
@@ -81,13 +85,16 @@ export async function searchBook() {
 
     const keyword = input.value;
     const searchType = document.getElementById("searchType").value;
-    if (keyword === "") return;
+    const genreId = document.getElementById("genreFilter")?.value || "";
+
+    // キーワードが空でも、ジャンルが指定されていれば検索できるようにする
+    if (keyword === "" && genreId === "") return;
 
     const searchBtn = document.getElementById("searchBtn");
     if (searchBtn) searchBtn.disabled = true;
 
     try {
-        const items = await fetchRakutenResults(keyword, searchType);
+        const items = await fetchRakutenResults(keyword, searchType, genreId);
         const newItems = items.filter((item) => !findDuplicateBook({
             isbn: item.isbn,
             title: item.title,

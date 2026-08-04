@@ -642,7 +642,7 @@ export function displayBooks() {
     }
 
     if (sortType === "title") {
-        sortedBooks.sort((a, b) => a.title.localeCompare(b.title, "ja"));
+        sortedBooks.sort((a, b) => (a.title || "").localeCompare(b.title || "", "ja"));
     }
 
     const htmlParts = [];
@@ -1012,7 +1012,7 @@ export function renderWishlistPage() {
         return;
     }
 
-    const sorted = [...wishlists].sort((a, b) => a.title.localeCompare(b.title, "ja"));
+    const sorted = [...wishlists].sort((a, b) => (a.title || "").localeCompare(b.title || "", "ja"));
 
     list.innerHTML = sorted.map((w) => `
         <div class="book wishlist">
