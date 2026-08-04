@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shelfio</title>
+
     <link rel="stylesheet" href="Tokens.css">
     <link rel="stylesheet" href="Forms.css">
     <link rel="stylesheet" href="Layout.css">
     <link rel="stylesheet" href="Books.css">
     <link rel="stylesheet" href="Pages.css">
     <link rel="stylesheet" href="Responsive.css">
+
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,9 +25,9 @@
 <body>
 
 <header>
-<div class="logo">
+    <div class="logo">
         📚 Shelfio
-</div>
+    </div>
 
     <nav>
         <a href="search.html">🔍 検索</a>
@@ -35,6 +38,7 @@
 </header>
 
 <div id="sideMenuOverlay" class="side-menu-overlay"></div>
+
 <aside id="sideMenu" class="side-menu">
     <button id="sideMenuClose" class="side-menu-close" aria-label="閉じる">&times;</button>
     <a href="index.html">🏠 トップへ戻る</a>
@@ -72,6 +76,7 @@
 <div id="searchResult"></div>
 
 <p class="reading-progress-title">手動で登録</p>
+
 <div class="form">
     <input id="title" placeholder="本のタイトル">
     <input id="author" placeholder="著者">
@@ -106,114 +111,4 @@
 <script src="main.js" type="module"></script>
 
 </body>
-
-</html><!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Shelfio</title>
-    <link rel="stylesheet" href="tokens.css">
-    <link rel="stylesheet" href="forms.css">
-    <link rel="stylesheet" href="layout.css">
-    <link rel="stylesheet" href="books.css">
-    <link rel="stylesheet" href="pages.css">
-    <link rel="stylesheet" href="responsive.css">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-
-<body>
-
-<header>
-<div class="logo">
-        📚 Shelfio
-</div>
-
-    <nav>
-        <a href="search.html">🔍 検索</a>
-        <a href="list.html">📚 本棚</a>
-        <a href="wishlist.html">💖 ほしい本</a>
-        <button id="menuToggleBtn" class="hamburger-btn">☰ その他</button>
-    </nav>
-</header>
-
-<div id="sideMenuOverlay" class="side-menu-overlay"></div>
-<aside id="sideMenu" class="side-menu">
-    <button id="sideMenuClose" class="side-menu-close" aria-label="閉じる">&times;</button>
-    <a href="index.html">🏠 トップへ戻る</a>
-    <a href="updates.html">🗓 更新</a>
-    <a href="stats.html">📊 統計</a>
-    <button id="logoutBtn">ログアウト</button>
-</aside>
-
-<h2>本を検索</h2>
-
-<select id="searchType">
-    <option value="title">タイトル</option>
-    <option value="author">著者</option>
-    <option value="publisher">出版社</option>
-    <option value="isbn">ISBN</option>
-</select>
-
-<select id="genreFilter">
-    <option value="">ジャンル：すべて</option>
-    <option value="001001">漫画（コミック）</option>
-    <option value="001017">ライトノベル</option>
-    <option value="001004">小説・エッセイ</option>
-    <option value="001019">文庫</option>
-    <option value="001020">新書</option>
-    <option value="001006">ビジネス・経済・就職</option>
-</select>
-
-<input
-    type="text"
-    id="bookSearch"
-    placeholder="検索キーワードを入力（ジャンル指定のみでも検索できます）">
-
-<button type="button" id="searchBtn" class="btn btn-primary">検索</button>
-
-<div id="searchResult"></div>
-
-<p class="reading-progress-title">手動で登録</p>
-<div class="form">
-    <input id="title" placeholder="本のタイトル">
-    <input id="author" placeholder="著者">
-    <input id="price" type="number" min="0" placeholder="価格(円)">
-
-    <div id="rating" class="rating">
-        <span onclick="setRating(1)">☆</span>
-        <span onclick="setRating(2)">☆</span>
-        <span onclick="setRating(3)">☆</span>
-        <span onclick="setRating(4)">☆</span>
-        <span onclick="setRating(5)">☆</span>
-    </div>
-
-    <label>
-        <input type="checkbox" id="purchased">
-        購入済み
-    </label>
-
-    <label>
-        読書状況
-        <select id="status">
-            <option value="unread">未読</option>
-            <option value="reading">読書中</option>
-            <option value="finished">読了済み</option>
-        </select>
-    </label>
-
-    <button class="btn btn-primary" onclick="addBook()">登録</button>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="main.js" type="module"></script>
-
-</body>
-
 </html>
