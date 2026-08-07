@@ -60,6 +60,32 @@ export async function fetchRakutenResults(keyword, searchType, genreId = "") {
 }
 
 // 💡 ISBNで楽天ブックスAPIを1件だけ検索し、あらすじ(itemCaption)を取得する
+// 💡 指定ジャンルの売れ筋ランキングを取得する（トップページの「今日のTOP10」用）
+// 例：漫画（コミック）=001001、ライトノベル=001017
+export async function fetchGenreRanking(genreId, limit = 10) {
+    const { data, error } = await supabase.functions.invoke("rakuten-search", {
+        body: { genreId, sort: "sales", page: 1 },
+    });
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    const items = (data.Items || []).map((item) => {
+        const info = item.Item;
+        return {
+            title: info.title,
+            author: info.author,
+            largeImageUrl: info.largeImageUrl || "",
+            isbn: (info.isbn || "").replace(/-/g, ""),
+            itemUrl: info.affiliateUrl || info.itemUrl || "",
+        };
+    });
+
+    return items.slice(0, limit);
+}
+
 export async function fetchRakutenBookByIsbn(isbn) {
     const { data, error } = await supabase.functions.invoke("rakuten-search", {
         body: { keyword: isbn, searchType: "isbn", page: 1 },
@@ -202,4 +228,47 @@ function renderPagination() {
 export function initSearchPage() {
     const searchBtn = document.getElementById("searchBtn");
     if (searchBtn) searchBtn.addEventListener("click", searchBook);
+}
+
+// 💡 指定した要素に「今日のTOP10」ランキングを描画する（index.html の #lightNovelRanking / #mangaRanking 用）
+async function renderRankingInto(elementId, genreId) {
+    const container = document.getElementById(elementId);
+    if (!container) return; // その要素が無いページでは何もしない
+
+    container.innerHTML = `<p class="no-rating">読み込み中...</p>`;
+
+    try {
+        const items = await fetchGenreRanking(genreId, 10);
+
+        if (!items.length) {
+            container.innerHTML = `<div class="empty-state">📚 <p>ランキングを取得できませんでした。</p></div>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <ol class="ranking-list">
+                ${items.map((info, i) => `
+                    <li class="ranking-item">
+                        <span class="ranking-rank">${i + 1}</span>
+                        <img src="${escapeHTML(info.largeImageUrl || "")}" alt="表紙" class="ranking-image" onerror="this.style.display='none'">
+                        <div class="ranking-info">
+                            <p class="ranking-title">${info.itemUrl
+                                ? `<a href="${escapeHTML(info.itemUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(info.title)}</a>`
+                                : escapeHTML(info.title)}</p>
+                            <p class="ranking-author">${escapeHTML(info.author || "")}</p>
+                        </div>
+                    </li>
+                `).join("")}
+            </ol>
+        `;
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = `<div class="empty-state">📚 <p>ランキングの取得に失敗しました。</p></div>`;
+    }
+}
+
+// 💡 トップページの「今日のライトノベルTOP10」「今日の漫画TOP10」を描画する
+export function renderTopRankings() {
+    renderRankingInto("lightNovelRanking", "001017"); // ライトノベル
+    renderRankingInto("mangaRanking", "001001"); // 漫画（コミック）
 }

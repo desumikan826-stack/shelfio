@@ -35,7 +35,7 @@ import {
     handleFrequencyChange,
 } from './schedule.js';
 import { renderStatsPage } from './stats.js';
-import { searchBook, initSearchPage } from './rakutenSearch.js';
+import { searchBook, initSearchPage, renderTopRankings } from './rakutenSearch.js';
 import { initSideMenu } from './menu.js';
 
 console.log("最新版script.js 読み込み成功");
@@ -78,6 +78,7 @@ loadBooks();
 initAuthForm();
 initLogout();
 initSearchPage();
+renderTopRankings();
 initSideMenu();
 initCollectionFilter();
 guardProtectedPages(getCurrentUser);
