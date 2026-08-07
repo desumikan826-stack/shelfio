@@ -21,6 +21,13 @@ import { fetchRakutenBookByIsbn } from './rakutenSearch.js';
 
 // 💡 二重登録チェック：ISBNが一致する本があればそれを返す。
 // ISBNが無い（比較できない）場合はタイトル＋著者の一致で判定する
+// 💡 タイトル比較：全角/半角の表記ゆれを統一し、数字は数値として比較する
+// （これが無いと「タイトル 10」が「タイトル 2」より前に来てしまう）
+function compareTitles(titleA, titleB) {
+    const normalize = (s) => (s || "").normalize("NFKC").trim();
+    return normalize(titleA).localeCompare(normalize(titleB), "ja", { numeric: true, sensitivity: "base" });
+}
+
 export function findDuplicateBook({ isbn, title, author }) {
     const normalizedIsbn = (isbn || "").replace(/-/g, "").trim();
     const normalizedTitle = (title || "").trim().toLowerCase();
@@ -642,7 +649,7 @@ export function displayBooks() {
     }
 
     if (sortType === "title") {
-        sortedBooks.sort((a, b) => (a.title || "").localeCompare(b.title || "", "ja"));
+        sortedBooks.sort((a, b) => compareTitles(a.title, b.title));
     }
 
     const htmlParts = [];
@@ -1012,7 +1019,7 @@ export function renderWishlistPage() {
         return;
     }
 
-    const sorted = [...wishlists].sort((a, b) => (a.title || "").localeCompare(b.title || "", "ja"));
+    const sorted = [...wishlists].sort((a, b) => compareTitles(a.title, b.title));
 
     list.innerHTML = sorted.map((w) => `
         <div class="book wishlist">
