@@ -52,6 +52,11 @@ export function setSearchResults(items) {
     currentSearchPage = 1;
 }
 
+// 💡 登録済みになった本を、ページ位置はそのまま検索結果からその場で取り除く
+export function removeFromSearchResults(items) {
+    allSearchResults = items;
+}
+
 export function setCurrentSearchPage(page) {
     currentSearchPage = page;
 }

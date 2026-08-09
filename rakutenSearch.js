@@ -5,6 +5,7 @@ import {
     RESULTS_PER_PAGE,
     setSearchResults,
     setCurrentSearchPage,
+    removeFromSearchResults,
 } from './state.js';
 import { addRakutenBook, addRakutenBookAsPurchased, findDuplicateBook } from './library.js';
 
@@ -141,6 +142,22 @@ function displaySearchResult(items) {
     renderSearchPage();
 }
 
+// 💡 検索結果から登録した本をその場で取り除く（再検索しなくても消える）
+function dropFromSearchResults(info) {
+    const remaining = allSearchResults.filter((item) => !(
+        (info.isbn && item.isbn === info.isbn) ||
+        (!info.isbn && item.title === info.title && item.author === info.author)
+    ));
+
+    const totalPages = Math.max(1, Math.ceil(remaining.length / RESULTS_PER_PAGE));
+    if (currentSearchPage > totalPages) {
+        setCurrentSearchPage(totalPages);
+    }
+
+    removeFromSearchResults(remaining);
+    renderSearchPage();
+}
+
 export function renderSearchPage() {
     const result = document.getElementById("searchResult");
     if (!result) return;
@@ -172,12 +189,18 @@ export function renderSearchPage() {
         const wishlistButton = document.createElement("button");
         wishlistButton.className = "btn btn-primary";
         wishlistButton.textContent = "💖 ほしい本として登録";
-        wishlistButton.onclick = () => addRakutenBook(info);
+        wishlistButton.onclick = async () => {
+            const success = await addRakutenBook(info);
+            if (success) dropFromSearchResults(info);
+        };
 
         const purchasedButton = document.createElement("button");
         purchasedButton.className = "btn btn-success";
         purchasedButton.textContent = "✅ 購入済みとして登録";
-        purchasedButton.onclick = () => addRakutenBookAsPurchased(info);
+        purchasedButton.onclick = async () => {
+            const success = await addRakutenBookAsPurchased(info);
+            if (success) dropFromSearchResults(info);
+        };
 
         registerRow.appendChild(wishlistButton);
         registerRow.appendChild(purchasedButton);

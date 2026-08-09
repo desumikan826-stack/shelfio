@@ -316,6 +316,23 @@
     color: var(--color-primary);
 }
 
+.folder-select-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--color-ink-soft);
+}
+
+.folder-select-inline select {
+    padding: 4px 8px;
+    font-size: 13px;
+    margin-right: 0;
+    background: #E4EBF1;
+    color: var(--color-primary);
+    border-color: transparent;
+}
+
 .reader-level-card {
     display: flex;
     align-items: center;

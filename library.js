@@ -442,6 +442,7 @@ export async function addRakutenBook(info) {
     await loadBooks();
 
     alert("ほしい本として登録しました");
+    return true;
 }
 
 // 💡 検索結果を「購入済みの本」として本棚（books）に直接登録する
@@ -480,6 +481,7 @@ export async function addRakutenBookAsPurchased(info) {
     await loadBooks();
 
     alert("購入済みの本として登録しました");
+    return true;
 }
 
 export async function addWishlistItem({ title, author, image = "", isbn = "", publisher = "", publish_date = "", pages = 0, price = 0, rating = 0 }) {
@@ -579,7 +581,7 @@ export async function purchaseWishlistItem(wishId) {
     await loadBooks();
 }
 
-export function displayBooks() {
+export async function displayBooks() {
     const list = document.getElementById("bookList");
     const search = document.getElementById("search");
     const stats = document.getElementById("bookStats");
@@ -595,6 +597,7 @@ export function displayBooks() {
 
     const keyword = search.value.toLowerCase();
     const sortType = document.getElementById("sortType")?.value || "none";
+    const knownCollections = await getKnownCollectionNames();
 
     // 本の統計を表示（所有本のみ）
     if (stats) {
@@ -704,11 +707,16 @@ export function displayBooks() {
                         </div>
                     ` : ""}
 
-                    ${book.collection ? `
-                        <p class="meta-display">
-                            <span class="collection-chip">📁 ${escapeHTML(book.collection)}</span>
-                        </p>
-                    ` : ""}
+                    <p class="meta-display">
+                        <label class="folder-select-inline">📁
+                            <select onchange="updateCollection('${book.id}', this.value)">
+                                <option value="">未分類</option>
+                                ${knownCollections.map((name) =>
+                                    `<option value="${escapeHTML(name)}" ${name === (book.collection || "").trim() ? "selected" : ""}>${escapeHTML(name)}</option>`
+                                ).join("")}
+                            </select>
+                        </label>
+                    </p>
 
                     <p>
                         評価：
