@@ -60,6 +60,13 @@ export function getStatusBreakdown(bookList) {
     };
 }
 
+// 💡 統計ページ用：購入済みの本の合計金額（未購入に戻した本は含めない）
+export function getTotalSpent(bookList) {
+    return bookList
+        .filter((book) => book.purchased)
+        .reduce((sum, book) => sum + (Number(book.price) || 0), 0);
+}
+
 let statusPieChartInstance = null;
 let tsundokuLineChartInstance = null;
 
@@ -121,8 +128,23 @@ function renderReadingTimeline() {
 
 // 💡 stats.html にある2つのcanvasにChart.jsでグラフを描画する
 // （stats.html以外のページにはcanvasが無いので何もしない）
+// 💡 統計ページの合計金額表示を描画する（#totalSpentがあるページのみ）
+function renderTotalSpent() {
+    const container = document.getElementById("totalSpent");
+    if (!container) return;
+
+    const total = getTotalSpent(books);
+    const count = books.filter((book) => book.purchased).length;
+
+    container.innerHTML = `
+        <p class="total-spent-amount">¥${total.toLocaleString("ja-JP")}</p>
+        <p class="no-rating">購入済み ${count}冊の合計</p>
+    `;
+}
+
 export function renderStatsPage() {
     renderReadingTimeline();
+    renderTotalSpent();
 
     const pieCanvas = document.getElementById("statusPieChart");
     const lineCanvas = document.getElementById("tsundokuLineChart");

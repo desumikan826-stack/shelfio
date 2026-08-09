@@ -146,6 +146,19 @@
     margin-top: 0;
 }
 
+.total-spent {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.total-spent-amount {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
 .chart-wrap {
     max-width: 480px;
     margin: 0 auto;
