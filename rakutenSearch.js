@@ -110,9 +110,14 @@ export async function searchBook() {
     const input = document.getElementById("bookSearch");
     if (!input) return;
 
-    const keyword = input.value;
+    let keyword = input.value;
     const searchType = document.getElementById("searchType").value;
     const genreId = document.getElementById("genreFilter")?.value || "";
+
+    // ISBN検索の場合、ハイフンや空白が入っていると楽天API側で見つからないことがあるので取り除く
+    if (searchType === "isbn") {
+        keyword = keyword.replace(/[^0-9Xx]/g, "");
+    }
 
     // キーワードが空でも、ジャンルが指定されていれば検索できるようにする
     if (keyword === "" && genreId === "") return;
