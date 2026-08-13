@@ -61,7 +61,7 @@ async function renderWishlistPage() {
     try {
         // Ensure we have currentUser; script-v3.js normally sets this when signed in
         if (!window.currentUser) {
-            const userRes = await supabase.auth.getUser();
+        const userRes = await window.globalSupabase.auth.getUser();
             window.currentUser = userRes?.data?.user || null;
         }
 
@@ -74,7 +74,7 @@ async function renderWishlistPage() {
         let items = window.wishlists || [];
         if (!items || items.length === 0) {
             // fetch from Supabase table (works even if this page loaded separately)
-            const { data, error } = await supabase
+            const { data, error } = await window.globalSupabase
                 .from('wishlists')
                 .select('*')
                 .eq('user_id', window.currentUser.id)
@@ -141,7 +141,7 @@ async function addWishlistFromForm() {
             await addWishlistItem(book);
         } else {
             // Fallback: insert directly via supabase
-            await supabase.from('wishlists').insert([{ ...book, user_id: window.currentUser.id }]);
+        await window.globalSupabase.from('wishlists').insert([{ ...book, user_id: window.currentUser.id }]);
         }
         // clear form
         document.getElementById('wishlistForm').reset();
