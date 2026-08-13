@@ -164,6 +164,99 @@
     margin: 0 auto;
 }
 
+.profile-page {
+    max-width: 920px;
+    margin: 0 auto 40px;
+    padding: 0 20px;
+}
+
+.profile-shell {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.profile-card,
+.profile-form {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 28px 24px;
+}
+
+.profile-card h2,
+.profile-form h2,
+.profile-form h3 {
+    margin-top: 0;
+}
+
+.profile-list {
+    display: grid;
+    gap: 14px;
+    margin: 22px 0 0;
+}
+
+.profile-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.profile-label {
+    font-weight: 700;
+    color: var(--color-ink-soft);
+}
+
+.profile-value {
+    margin: 0;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.profile-value.id {
+    font-family: var(--font-body);
+    font-size: 13px;
+    letter-spacing: .02em;
+    background: rgba(33, 64, 95, 0.06);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    display: inline-block;
+}
+
+.profile-form {
+    display: grid;
+    gap: 16px;
+}
+
+.profile-form label {
+    display: grid;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--color-ink);
+}
+
+.profile-form input,
+.profile-form select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.profile-message {
+    min-height: 24px;
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-primary);
+}
+
+.profile-message.error {
+    color: var(--color-danger);
+}
+
 /* 今日のTOP10ランキング */
 .ranking-list {
     list-style: none;
