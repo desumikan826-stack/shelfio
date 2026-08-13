@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>プロフィール</title>
+    <link rel="stylesheet" href="Tokens.css">
+    <link rel="stylesheet" href="Forms.css">
+    <link rel="stylesheet" href="Layout.css">
+    <link rel="stylesheet" href="Books.css">
+    <link rel="stylesheet" href="Pages.css">
+    <link rel="stylesheet" href="Responsive.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">📚 Shelfio</div>
+        <nav style="display:none;">
+            <a href="search.html">🔍 検索</a>
+            <a href="list.html">📚 本棚</a>
+            <a href="wishlist.html">💖 ほしい本</a>
+            <a href="profile.html">👤 プロフィール</a>
+            <button id="menuToggleBtn" class="hamburger-btn">☰ その他</button>
+        </nav>
+    </header>
+
+    <div id="sideMenuOverlay" class="side-menu-overlay"></div>
+    <aside id="sideMenu" class="side-menu">
+        <button id="sideMenuClose" class="side-menu-close" aria-label="閉じる">&times;</button>
+        <a href="index.html">🏠 トップへ戻る</a>
+        <a href="profile.html">👤 プロフィール</a>
+        <a href="updates.html">🗓 更新</a>
+        <a href="stats.html">📊 統計</a>
+        <button id="logoutBtn">ログアウト</button>
+    </aside>
+
+    <main class="profile-page">
+        <section class="profile-shell">
+            <article class="profile-card" aria-live="polite">
+                <h2>プロフィール</h2>
+                <dl class="profile-list">
+                    <div class="profile-row">
+                        <dt class="profile-label">名前</dt>
+                        <dd id="profileName" class="profile-value">読み込み中...</dd>
+                    </div>
+                    <div class="profile-row">
+                        <dt class="profile-label">性別</dt>
+                        <dd id="profileGender" class="profile-value">読み込み中...</dd>
+                    </div>
+                    <div class="profile-row">
+                        <dt class="profile-label">固有ID</dt>
+                        <dd id="profileId" class="profile-value id">読み込み中...</dd>
+                    </div>
+                </dl>
+            </article>
+
+            <section class="profile-form" aria-labelledby="profile-form-heading">
+                <h2 id="profile-form-heading">プロフィール設定</h2>
+                <form id="profileForm">
+                    <label for="nameInput">
+                        名前
+                        <input id="nameInput" type="text" maxlength="40" placeholder="名前を入力">
+                    </label>
+
+                    <label for="genderInput">
+                        性別
+                        <select id="genderInput">
+                            <option value="">未設定</option>
+                            <option value="male">男性</option>
+                            <option value="female">女性</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </label>
+
+                    <button type="submit" class="btn btn-primary">保存する</button>
+                    <p id="profileMessage" class="profile-message" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js" type="module"></script>
+    <script src="profile.js" type="module"></script>
+</body>
+</html>

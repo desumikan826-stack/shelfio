@@ -147,7 +147,8 @@ export async function guardProtectedPages(getCurrentUserFn) {
             page === "search.html" ||
             page === "wishlist.html" ||
             page === "updates.html" ||
-            page === "stats.html"
+            page === "stats.html" ||
+            page === "profile.html"
         )
     ) {
         location.href = "login.html";
