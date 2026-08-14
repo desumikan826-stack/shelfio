@@ -6,6 +6,7 @@ const STATUS_LABEL = {
     finished: "読了済み",
 };
 
+
 // 💡 URLの?id=固有ID から、フレンドの本棚を読み取り専用で表示する
 //    公開設定(bookshelf_visibility)とフレンド関係は、RLS(Supabase側)でも二重にチェックされている
 export async function renderFriendBooksPage() {
