@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ほしい本 - Shelfio</title>
+    <title>プロフィール - Shelfio</title>
     <link rel="stylesheet" href="Tokens.css">
     <link rel="stylesheet" href="Forms.css">
     <link rel="stylesheet" href="Layout.css">
@@ -47,23 +46,33 @@
 </aside>
 
 <main>
-    <h1>ほしい本（Wishlist）</h1>
+    <h2>プロフィール</h2>
 
-    <section class="add-wishlist">
-        <h2>手動で追加</h2>
-        <form id="wishlistForm" class="form" onsubmit="event.preventDefault(); addWishlistFromForm();">
-            <input id="w-title" placeholder="タイトル" required>
-            <input id="w-author" placeholder="著者">
-            <input id="w-isbn" placeholder="ISBN">
-            <input id="w-image" placeholder="画像URL">
-            <input id="w-price" placeholder="価格">
-            <button type="submit" class="btn btn-primary">追加</button>
-        </form>
-    </section>
+    <section class="stats-section">
+        <div class="form">
+            <label>
+                名前
+                <input id="profileName" placeholder="名前を入力">
+            </label>
 
-    <section>
-        <h2>リスト</h2>
-        <div id="wishlistList" class="book-list">読み込み中...</div>
+            <label>
+                性別
+                <select id="profileGender">
+                    <option value="">未設定</option>
+                    <option value="male">男性</option>
+                    <option value="female">女性</option>
+                    <option value="other">その他</option>
+                    <option value="unspecified">回答しない</option>
+                </select>
+            </label>
+
+            <label>
+                固有ID
+                <input id="profileId" readonly>
+            </label>
+
+            <button type="button" class="btn btn-primary" onclick="saveProfile()">保存する</button>
+        </div>
     </section>
 </main>
 
