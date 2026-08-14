@@ -15,22 +15,31 @@ export async function renderProfilePage() {
 
     if (idInput) idInput.value = user.id;
 
-    const { data, error } = await supabase
+    // 💡 固有IDの行はログイン時(auth.js の ensureProfileRow)に自動作成されている前提。
+    //    念のため見つからない場合はここでも作成しておく
+    let { data, error } = await supabase
         .from("profiles")
         .select("name, gender")
         .eq("id", user.id)
         .maybeSingle();
 
     if (error) {
-        // profilesテーブルが未作成の場合など。固有IDだけは表示できるようにしておく
         console.warn("プロフィールの読み込みに失敗しました:", error.message);
         return;
     }
 
-    if (data) {
-        if (nameInput) nameInput.value = data.name || "";
-        if (genderSelect) genderSelect.value = data.gender || "";
+    if (!data) {
+        const { error: insertError } = await supabase
+            .from("profiles")
+            .upsert({ id: user.id }, { onConflict: "id", ignoreDuplicates: true });
+        if (insertError) {
+            console.warn("固有IDの自動保存に失敗しました:", insertError.message);
+        }
+        data = { name: "", gender: "" };
     }
+
+    if (nameInput) nameInput.value = data.name || "";
+    if (genderSelect) genderSelect.value = data.gender || "";
 }
 
 // 💡 名前・性別を profiles テーブルに保存する（未登録なら新規作成、登録済みなら更新）

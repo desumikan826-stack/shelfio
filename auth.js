@@ -29,12 +29,27 @@ export async function signOut() {
     if (error) throw error;
 }
 
+// 💡 ログインしたら固有ID(auth.uid())だけを持つ行をprofilesテーブルに自動作成する。
+//    既にプロフィールが存在する場合は何もしない（name/genderを上書きしない）
+async function ensureProfileRow(user) {
+    if (!user) return;
+    const { error } = await supabase
+        .from("profiles")
+        .upsert({ id: user.id }, { onConflict: "id", ignoreDuplicates: true });
+
+    if (error) {
+        console.warn("固有IDの自動保存に失敗しました:", error.message);
+    }
+}
+
 supabase.auth.onAuthStateChange((event, session) => {
 
     currentUser = session?.user ?? null;
     window.currentUser = currentUser;
 
     console.log(event, currentUser);
+
+    if (currentUser) ensureProfileRow(currentUser);
 
     updateUI();
 
