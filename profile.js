@@ -1,7 +1,7 @@
 import { supabase, getCurrentUser } from './supabaseClient.js';
 
 // 💡 profile.html にある入力欄に、Supabaseの profiles テーブルから
-//    読み込んだ「名前」「性別」と、ログインユーザーの固有ID(auth.uid())を反映する
+//    読み込んだ「名前」「性別」「本棚の公開設定」と、ログインユーザーの固有ID(auth.uid())を反映する
 export async function renderProfilePage() {
     const idInput = document.getElementById("profileId");
     const nameInput = document.getElementById("profileName");
@@ -76,16 +76,3 @@ export async function saveProfile() {
 // 💡 固有IDをクリップボードにコピーする（フレンド申請で相手に伝える用）
 export async function copyProfileId() {
     const idInput = document.getElementById("profileId");
-    if (!idInput?.value) return;
-    try {
-        await navigator.clipboard.writeText(idInput.value);
-        alert("固有IDをコピーしました。フレンドに伝えてください。");
-    } catch (e) {
-        console.warn("クリップボードへのコピーに失敗しました:", e);
-        idInput.select();
-    }
-<<<<<<< HEAD
-}
-=======
-}
->>>>>>> 9a1debf629ff70390b075800d63679f567226d18
