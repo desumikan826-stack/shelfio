@@ -35,6 +35,15 @@ import {
     handleFrequencyChange,
 } from './schedule.js';
 import { renderStatsPage } from './stats.js';
+import { renderProfilePage, saveProfile, copyProfileId } from './profile.js';
+import {
+    renderFriendsPage,
+    sendFriendRequest,
+    acceptFriendRequest,
+    rejectFriendRequest,
+    cancelFriendRequest,
+    removeFriend,
+} from './friends.js';
 import { searchBook, initSearchPage, renderTopRankings } from './rakutenSearch.js';
 import { initSideMenu } from './menu.js';
 
@@ -67,6 +76,17 @@ window.showWishlistDetail = showWishlistDetail;
 window.backToWishlist = backToWishlist;
 window.addWishlistFromForm = addWishlistFromForm;
 
+// プロフィール
+window.saveProfile = saveProfile;
+window.copyProfileId = copyProfileId;
+
+// フレンド
+window.sendFriendRequest = sendFriendRequest;
+window.acceptFriendRequest = acceptFriendRequest;
+window.rejectFriendRequest = rejectFriendRequest;
+window.cancelFriendRequest = cancelFriendRequest;
+window.removeFriend = removeFriend;
+
 // Wishlists 外部公開
 window.purchaseWishlistItem = purchaseWishlistItem;
 window.deleteWishlistItem = deleteWishlistItem;
@@ -81,4 +101,6 @@ initSearchPage();
 renderTopRankings();
 initSideMenu();
 initCollectionFilter();
+renderProfilePage();
+renderFriendsPage();
 guardProtectedPages(getCurrentUser);

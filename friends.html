@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>統計 - Shelfio</title>
+    <title>フレンド - Shelfio</title>
     <link rel="stylesheet" href="Tokens.css">
     <link rel="stylesheet" href="Forms.css">
     <link rel="stylesheet" href="Layout.css">
@@ -47,35 +47,39 @@
 </aside>
 
 <main>
-    <h2>統計</h2>
+    <h2>フレンド</h2>
 
     <section class="stats-section">
-        <h3>購入金額の合計</h3>
-        <div id="totalSpent" class="total-spent"></div>
+        <h3>自分の固有ID</h3>
+        <p class="no-rating">この固有IDを相手に伝えると、あなたにフレンド申請を送ってもらえます。</p>
+        <p id="friendsMyId" class="total-spent-amount" style="font-size:16px;word-break:break-all;"></p>
     </section>
 
     <section class="stats-section">
-        <h3>読書状況の内訳</h3>
-        <div class="chart-wrap">
-            <canvas id="statusPieChart"></canvas>
+        <h3>固有IDでフレンド申請を送る</h3>
+        <div class="form">
+            <input id="friendTargetId" placeholder="相手の固有IDを入力">
+            <button type="button" class="btn btn-primary" onclick="sendFriendRequest()">申請を送る</button>
         </div>
     </section>
 
     <section class="stats-section">
-        <h3>積読増減の推移（直近6か月）</h3>
-        <div class="chart-wrap">
-            <canvas id="tsundokuLineChart"></canvas>
-        </div>
+        <h3>受け取った申請</h3>
+        <div id="incomingRequestList"></div>
     </section>
 
     <section class="stats-section">
-        <h3>読書タイムライン</h3>
-        <div id="readingTimeline"></div>
+        <h3>送った申請</h3>
+        <div id="outgoingRequestList"></div>
+    </section>
+
+    <section class="stats-section">
+        <h3>フレンド一覧</h3>
+        <div id="friendList"></div>
     </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="main.js" type="module"></script>
 
 </body>
