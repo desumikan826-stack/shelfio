@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>プロフィール - Shelfio</title>
+    <title>フレンドの本棚 - Shelfio</title>
     <link rel="stylesheet" href="Tokens.css">
     <link rel="stylesheet" href="Forms.css">
     <link rel="stylesheet" href="Layout.css">
@@ -47,44 +47,11 @@
 </aside>
 
 <main>
-    <div class="login-container">
-        <h2>プロフィール</h2>
+    <a href="friends.html" class="btn btn-secondary small-button">← フレンド一覧へ戻る</a>
 
-        <div class="form">
-            <label>
-                名前
-                <input id="profileName" placeholder="名前を入力">
-            </label>
+    <h2 id="friendBooksTitle">本棚</h2>
 
-            <label>
-                性別
-                <select id="profileGender">
-                    <option value="">未設定</option>
-                    <option value="male">男性</option>
-                    <option value="female">女性</option>
-                    <option value="other">その他</option>
-                    <option value="unspecified">回答しない</option>
-                </select>
-            </label>
-
-            <label>
-                本棚の公開設定
-                <select id="profileVisibility">
-                    <option value="public">公開（誰でも見れる）</option>
-                    <option value="friends">フレンドのみ</option>
-                    <option value="private">非公開（誰にも見せない）</option>
-                </select>
-            </label>
-
-            <label>
-                固有ID
-                <input id="profileId" readonly>
-            </label>
-            <button type="button" class="btn btn-secondary small-button" onclick="copyProfileId()">📋 固有IDをコピー</button>
-
-            <button type="button" class="btn btn-primary" onclick="saveProfile()">保存する</button>
-        </div>
-    </div>
+    <div id="friendBookList" class="book-list"></div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

@@ -85,7 +85,9 @@ export async function updateUI() {
 
     } else {
 
-        if (nav) nav.style.display = "none";
+        const page = location.pathname.split("/").pop();
+        // 💡 検索ページはログイン不要で使えるので、未ログインでもヘッダーメニューは隠さない
+        if (nav) nav.style.display = (page === "search.html") ? "flex" : "none";
 
         if (message) {
             message.innerHTML = `
@@ -159,12 +161,12 @@ export async function guardProtectedPages(getCurrentUserFn) {
         !user &&
         (
             page === "list.html" ||
-            page === "search.html" ||
             page === "wishlist.html" ||
             page === "updates.html" ||
             page === "stats.html" ||
             page === "profile.html" ||
-            page === "friends.html"
+            page === "friends.html" ||
+            page === "friend-books.html"
         )
     ) {
         location.href = "login.html";

@@ -6,9 +6,10 @@ export async function renderProfilePage() {
     const idInput = document.getElementById("profileId");
     const nameInput = document.getElementById("profileName");
     const genderSelect = document.getElementById("profileGender");
+    const visibilitySelect = document.getElementById("profileVisibility");
 
     // profile.html以外では何もしない
-    if (!idInput && !nameInput && !genderSelect) return;
+    if (!idInput && !nameInput && !genderSelect && !visibilitySelect) return;
 
     const user = await getCurrentUser();
     if (!user) return;
@@ -19,7 +20,7 @@ export async function renderProfilePage() {
     //    念のため見つからない場合はここでも作成しておく
     let { data, error } = await supabase
         .from("profiles")
-        .select("name, gender")
+        .select("name, gender, bookshelf_visibility")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -35,14 +36,15 @@ export async function renderProfilePage() {
         if (insertError) {
             console.warn("固有IDの自動保存に失敗しました:", insertError.message);
         }
-        data = { name: "", gender: "" };
+        data = { name: "", gender: "", bookshelf_visibility: "friends" };
     }
 
     if (nameInput) nameInput.value = data.name || "";
     if (genderSelect) genderSelect.value = data.gender || "";
+    if (visibilitySelect) visibilitySelect.value = data.bookshelf_visibility || "friends";
 }
 
-// 💡 名前・性別を profiles テーブルに保存する（未登録なら新規作成、登録済みなら更新）
+// 💡 名前・性別・本棚の公開設定を profiles テーブルに保存する（未登録なら新規作成、登録済みなら更新）
 export async function saveProfile() {
     const user = await getCurrentUser();
     if (!user) {
@@ -52,11 +54,13 @@ export async function saveProfile() {
 
     const name = document.getElementById("profileName")?.value.trim() || "";
     const gender = document.getElementById("profileGender")?.value || "";
+    const bookshelfVisibility = document.getElementById("profileVisibility")?.value || "friends";
 
     const { error } = await supabase.from("profiles").upsert({
         id: user.id,
         name,
         gender,
+        bookshelf_visibility: bookshelfVisibility,
         updated_at: new Date().toISOString(),
     });
 
@@ -69,4 +73,15 @@ export async function saveProfile() {
     alert("プロフィールを保存しました。");
 }
 
-window.saveProfile = saveProfile;
+// 💡 固有IDをクリップボードにコピーする（フレンド申請で相手に伝える用）
+export async function copyProfileId() {
+    const idInput = document.getElementById("profileId");
+    if (!idInput?.value) return;
+    try {
+        await navigator.clipboard.writeText(idInput.value);
+        alert("固有IDをコピーしました。フレンドに伝えてください。");
+    } catch (e) {
+        console.warn("クリップボードへのコピーに失敗しました:", e);
+        idInput.select();
+    }
+}

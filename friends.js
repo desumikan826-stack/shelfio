@@ -88,6 +88,7 @@ export async function renderFriendsPage() {
                     <div class="schedule-card">
                         <strong>${displayName(otherId)}</strong>
                         <div class="book-actions">
+                            <a class="btn btn-secondary small-button" href="friend-books.html?id=${encodeURIComponent(otherId)}">📚 本棚を見る</a>
                             <button class="btn btn-danger small-button" onclick="removeFriend('${r.id}')">フレンド解除</button>
                         </div>
                     </div>

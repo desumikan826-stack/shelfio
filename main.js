@@ -44,6 +44,7 @@ import {
     cancelFriendRequest,
     removeFriend,
 } from './friends.js';
+import { renderFriendBooksPage } from './friendBooks.js';
 import { searchBook, initSearchPage, renderTopRankings } from './rakutenSearch.js';
 import { initSideMenu } from './menu.js';
 
@@ -103,4 +104,5 @@ initSideMenu();
 initCollectionFilter();
 renderProfilePage();
 renderFriendsPage();
+renderFriendBooksPage();
 guardProtectedPages(getCurrentUser);
