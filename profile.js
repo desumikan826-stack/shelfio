@@ -84,4 +84,8 @@ export async function copyProfileId() {
         console.warn("クリップボードへのコピーに失敗しました:", e);
         idInput.select();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 9a1debf629ff70390b075800d63679f567226d18
