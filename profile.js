@@ -76,3 +76,12 @@ export async function saveProfile() {
 // 💡 固有IDをクリップボードにコピーする（フレンド申請で相手に伝える用）
 export async function copyProfileId() {
     const idInput = document.getElementById("profileId");
+    if (!idInput?.value) return;
+    try {
+        await navigator.clipboard.writeText(idInput.value);
+        alert("固有IDをコピーしました。フレンドに伝えてください。");
+    } catch (e) {
+        console.warn("クリップボードへのコピーに失敗しました:", e);
+        idInput.select();
+    }
+}
