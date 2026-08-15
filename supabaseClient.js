@@ -27,6 +27,14 @@ export function escapeHTML(value) {
 }
 window.escapeHTML = escapeHTML;
 
+// 💡 Amazon.co.jpの検索結果ページへのリンクを作る（ASIN等が無いので検索リンクで代用）
+//    ISBNがあれば最優先（一番ピンポイントで探せる）、無ければタイトル＋著者で検索する
+export function getAmazonSearchUrl({ isbn, title, author } = {}) {
+    const query = isbn ? isbn : `${title || ""} ${author || ""}`.trim();
+    if (!query) return "";
+    return `https://www.amazon.co.jp/s?k=${encodeURIComponent(query)}`;
+}
+
 // 💡 各所で繰り返されるユーザー取得処理をまとめたヘルパー
 export async function getCurrentUser() {
     const {

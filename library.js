@@ -1,4 +1,4 @@
-import { supabase, escapeHTML, getCurrentUser } from './supabaseClient.js';
+import { supabase, escapeHTML, getCurrentUser, getAmazonSearchUrl } from './supabaseClient.js';
 import {
     books,
     wishlists,
@@ -1039,6 +1039,7 @@ export function renderWishlistPage() {
                 <p>ISBN：${escapeHTML(w.isbn || "なし")}</p>
                 ${w.price ? `<p>価格：${escapeHTML(w.price)}円</p>` : ""}
                 ${w.item_url ? `<p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(w.item_url)}" target="_blank" rel="noopener noreferrer">🛒 楽天ブックスで購入</a></p>` : ""}
+                <p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(getAmazonSearchUrl(w))}" target="_blank" rel="noopener noreferrer">🛒 Amazonで買う</a></p>
 
                 <p>
                     <button class="btn btn-success" onclick="purchaseWishlistItem('${w.id}')">購入済みにする</button>
@@ -1083,6 +1084,7 @@ async function renderWishlistDetailView() {
                     <p>ISBN：${escapeHTML(item.isbn || "なし")}</p>
                     ${item.price ? `<p>価格：${escapeHTML(item.price)}円</p>` : ""}
                     ${item.item_url ? `<p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(item.item_url)}" target="_blank" rel="noopener noreferrer">🛒 楽天ブックスで購入</a></p>` : ""}
+                    <p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(getAmazonSearchUrl(item))}" target="_blank" rel="noopener noreferrer">🛒 Amazonで買う</a></p>
                     <p>
                         <button class="btn btn-success" onclick="purchaseWishlistItem('${item.id}')">購入済みにする</button>
                         <button class="btn btn-danger" onclick="deleteWishlistItem('${item.id}')">削除</button>

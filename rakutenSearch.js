@@ -1,4 +1,4 @@
-import { supabase, escapeHTML } from './supabaseClient.js';
+import { supabase, escapeHTML, getAmazonSearchUrl } from './supabaseClient.js';
 import {
     allSearchResults,
     currentSearchPage,
@@ -106,6 +106,39 @@ export async function fetchRakutenBookByIsbn(isbn) {
     };
 }
 
+// 💡 openBD(https://openbd.jp)からISBNで書誌情報を取得する。
+//    楽天ブックスAPIにキーワード検索の代わりにはならない（ISBN指定専用）が、
+//    APIキー不要・CORS対応で直接ブラウザから呼べるため、
+//    楽天で見つからなかったISBN検索のフォールバックとして使う
+export async function fetchOpenBDByIsbn(isbn) {
+    try {
+        const res = await fetch(`https://api.openbd.jp/v1/get?isbn=${encodeURIComponent(isbn)}`);
+        if (!res.ok) return null;
+
+        const data = await res.json();
+        const entry = data && data[0];
+        if (!entry) return null;
+
+        const summary = entry.summary || {};
+        if (!summary.title) return null;
+
+        return {
+            title: summary.title || "",
+            author: summary.author || "",
+            publisherName: summary.publisher || "",
+            salesDate: summary.pubdate || "",
+            itemPrice: "",
+            largeImageUrl: summary.cover || "",
+            isbn: (summary.isbn || isbn).replace(/-/g, ""),
+            itemUrl: "",
+            source: "openbd",
+        };
+    } catch (e) {
+        console.error("openBDの取得に失敗しました:", e);
+        return null;
+    }
+}
+
 export async function searchBook() {
     const input = document.getElementById("bookSearch");
     if (!input) return;
@@ -126,7 +159,14 @@ export async function searchBook() {
     if (searchBtn) searchBtn.disabled = true;
 
     try {
-        const items = await fetchRakutenResults(keyword, searchType, genreId);
+        let items = await fetchRakutenResults(keyword, searchType, genreId);
+
+        // 💡 ISBN検索で楽天ブックスに無かった場合、openBDでも探してみる
+        if (searchType === "isbn" && items.length === 0 && keyword) {
+            const openBdItem = await fetchOpenBDByIsbn(keyword);
+            if (openBdItem) items = [openBdItem];
+        }
+
         const newItems = items.filter((item) => !findDuplicateBook({
             isbn: item.isbn,
             title: item.title,
@@ -187,6 +227,8 @@ export function renderSearchPage() {
             ${info.salesDate ? `<p>発売日：${escapeHTML(info.salesDate)}</p>` : ""}
             ${info.itemPrice ? `<p>価格：${escapeHTML(info.itemPrice)}円</p>` : ""}
             ${info.itemUrl ? `<p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(info.itemUrl)}" target="_blank" rel="noopener noreferrer">🛒 楽天ブックスで購入</a></p>` : ""}
+            <p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(getAmazonSearchUrl(info))}" target="_blank" rel="noopener noreferrer">🛒 Amazonで買う</a></p>
+            ${info.source === "openbd" ? `<p class="no-rating">📖 openBDから取得（価格・購入リンクなし）</p>` : ""}
         `;
 
         const registerRow = document.createElement("p");
