@@ -106,6 +106,26 @@ export async function fetchRakutenBookByIsbn(isbn) {
     };
 }
 
+// 💡 Google Books APIから表紙画像だけを取得する（openBDに表紙が無かった場合のフォールバック用）
+//    APIキー不要・CORS対応でブラウザから直接呼べる
+async function fetchGoogleBooksCoverByIsbn(isbn) {
+    try {
+        const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${encodeURIComponent(isbn)}`);
+        if (!res.ok) return "";
+
+        const data = await res.json();
+        const imageLinks = data.items?.[0]?.volumeInfo?.imageLinks;
+        if (!imageLinks) return "";
+
+        const url = imageLinks.thumbnail || imageLinks.smallThumbnail || "";
+        // Google Books APIはhttpで返すことがあるのでhttpsに統一
+        return url.replace(/^http:/, "https:");
+    } catch (e) {
+        console.warn("Google Booksからの表紙取得に失敗しました:", e);
+        return "";
+    }
+}
+
 // 💡 openBD(https://openbd.jp)からISBNで書誌情報を取得する。
 //    楽天ブックスAPIにキーワード検索の代わりにはならない（ISBN指定専用）が、
 //    APIキー不要・CORS対応で直接ブラウザから呼べるため、
@@ -122,13 +142,19 @@ export async function fetchOpenBDByIsbn(isbn) {
         const summary = entry.summary || {};
         if (!summary.title) return null;
 
+        // 💡 openBDは表紙画像を持っていない本が多いので、無ければGoogle Booksを試す
+        let largeImageUrl = summary.cover || "";
+        if (!largeImageUrl) {
+            largeImageUrl = await fetchGoogleBooksCoverByIsbn(isbn);
+        }
+
         return {
             title: summary.title || "",
             author: summary.author || "",
             publisherName: summary.publisher || "",
             salesDate: summary.pubdate || "",
             itemPrice: "",
-            largeImageUrl: summary.cover || "",
+            largeImageUrl,
             isbn: (summary.isbn || isbn).replace(/-/g, ""),
             itemUrl: "",
             source: "openbd",
@@ -184,15 +210,27 @@ export async function searchBook() {
 
 function displaySearchResult(items) {
     setSearchResults(items);
+    selectedKeys.clear(); // 💡 新しい検索結果になったら選択状態はリセットする
     renderSearchPage();
+}
+
+// 💡 一括登録のチェック選択状態（ページをまたいでも保持される）
+const selectedKeys = new Set();
+
+// 💡 本を一意に識別するキー（DBに登録前なのでISBN、無ければタイトル＋著者で代用）
+function getItemKey(info) {
+    return info.isbn || `${info.title}|${info.author}`;
 }
 
 // 💡 検索結果から登録した本をその場で取り除く（再検索しなくても消える）
 function dropFromSearchResults(info) {
-    const remaining = allSearchResults.filter((item) => !(
-        (info.isbn && item.isbn === info.isbn) ||
-        (!info.isbn && item.title === info.title && item.author === info.author)
-    ));
+    dropKeysFromSearchResults([getItemKey(info)]);
+}
+
+// 💡 一括登録で複数件登録した後、まとめて検索結果から取り除く
+function dropKeysFromSearchResults(keys) {
+    const keySet = new Set(keys);
+    const remaining = allSearchResults.filter((item) => !keySet.has(getItemKey(item)));
 
     const totalPages = Math.max(1, Math.ceil(remaining.length / RESULTS_PER_PAGE));
     if (currentSearchPage > totalPages) {
@@ -210,17 +248,24 @@ export function renderSearchPage() {
     result.innerHTML = "";
 
     if (!allSearchResults.length) {
-        result.innerHTML = `<div class="empty-state">🔍 <p>登録済みの本を除いて、該当する本が見つかりませんでした。</p></div>`;
+        result.innerHTML = `<div class="empty-state">🔍 <p>登録済みの本を除いて、該当する本が見つかりませんでした。</p><p>タイトルや著者名で見つからない場合は、ISBNで検索してみてください。</p></div>`;
         return;
     }
 
     const start = (currentSearchPage - 1) * RESULTS_PER_PAGE;
     const pageItems = allSearchResults.slice(start, start + RESULTS_PER_PAGE);
 
+    result.appendChild(buildBulkToolbar(pageItems));
+
     pageItems.forEach((info) => {
+        const key = getItemKey(info);
         const div = document.createElement("div");
         div.className = "book";
         div.innerHTML = `
+            <label class="search-select-label">
+                <input type="checkbox" class="search-select-checkbox" ${selectedKeys.has(key) ? "checked" : ""}>
+                この本を選択
+            </label>
             <img src="${escapeHTML(info.largeImageUrl || "")}" onerror="this.style.display='none'">
             <h3>${escapeHTML(info.title)}</h3>
             <p>著者：${escapeHTML(info.author)}</p>
@@ -230,6 +275,16 @@ export function renderSearchPage() {
             <p><a class="btn btn-secondary rakuten-link" href="${escapeHTML(getAmazonSearchUrl(info))}" target="_blank" rel="noopener noreferrer">🛒 Amazonで買う</a></p>
             ${info.source === "openbd" ? `<p class="no-rating">📖 openBDから取得（価格・購入リンクなし）</p>` : ""}
         `;
+
+        const checkbox = div.querySelector(".search-select-checkbox");
+        checkbox.addEventListener("change", () => {
+            if (checkbox.checked) {
+                selectedKeys.add(key);
+            } else {
+                selectedKeys.delete(key);
+            }
+            updateBulkToolbar(pageItems);
+        });
 
         const registerRow = document.createElement("p");
 
@@ -257,6 +312,95 @@ export function renderSearchPage() {
     });
 
     renderPagination();
+}
+
+// 💡 「選択した本をまとめて登録」ツールバーを作る（ページ上部に表示）
+function buildBulkToolbar(pageItems) {
+    const toolbar = document.createElement("div");
+    toolbar.id = "bulkToolbar";
+    toolbar.style.cssText = "display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:15px;padding:10px 12px;background:var(--color-surface-soft);border-radius:var(--radius-md);";
+
+    const selectAllLabel = document.createElement("label");
+    selectAllLabel.style.cssText = "display:flex;align-items:center;gap:4px;white-space:nowrap;";
+    const selectAllCheckbox = document.createElement("input");
+    selectAllCheckbox.type = "checkbox";
+    selectAllCheckbox.id = "selectAllOnPage";
+    selectAllCheckbox.addEventListener("change", () => {
+        pageItems.forEach((info) => {
+            if (selectAllCheckbox.checked) {
+                selectedKeys.add(getItemKey(info));
+            } else {
+                selectedKeys.delete(getItemKey(info));
+            }
+        });
+        renderSearchPage();
+    });
+    selectAllLabel.appendChild(selectAllCheckbox);
+    selectAllLabel.appendChild(document.createTextNode("このページを全選択"));
+
+    const countSpan = document.createElement("span");
+    countSpan.id = "selectedCount";
+    countSpan.className = "no-rating";
+    countSpan.textContent = `${selectedKeys.size}冊選択中`;
+
+    const wishlistBulkBtn = document.createElement("button");
+    wishlistBulkBtn.type = "button";
+    wishlistBulkBtn.className = "btn btn-primary small-button";
+    wishlistBulkBtn.textContent = "💖 選択した本をほしい本として一括登録";
+    wishlistBulkBtn.onclick = () => bulkRegisterSelected(false);
+
+    const purchasedBulkBtn = document.createElement("button");
+    purchasedBulkBtn.type = "button";
+    purchasedBulkBtn.className = "btn btn-success small-button";
+    purchasedBulkBtn.textContent = "✅ 選択した本を購入済みとして一括登録";
+    purchasedBulkBtn.onclick = () => bulkRegisterSelected(true);
+
+    toolbar.appendChild(selectAllLabel);
+    toolbar.appendChild(countSpan);
+    toolbar.appendChild(wishlistBulkBtn);
+    toolbar.appendChild(purchasedBulkBtn);
+
+    // 現在のページが全選択済みかどうかを反映
+    selectAllCheckbox.checked = pageItems.length > 0 && pageItems.every((info) => selectedKeys.has(getItemKey(info)));
+
+    return toolbar;
+}
+
+// 💡 チェックボックスが変わるたびにツールバーの選択数・全選択チェック状態だけ更新する（本一覧は再描画しない）
+function updateBulkToolbar(pageItems) {
+    const countSpan = document.getElementById("selectedCount");
+    if (countSpan) countSpan.textContent = `${selectedKeys.size}冊選択中`;
+
+    const selectAllCheckbox = document.getElementById("selectAllOnPage");
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = pageItems.length > 0 && pageItems.every((info) => selectedKeys.has(getItemKey(info)));
+    }
+}
+
+// 💡 チェックを入れた本をまとめて登録する
+async function bulkRegisterSelected(asPurchased) {
+    const targets = allSearchResults.filter((info) => selectedKeys.has(getItemKey(info)));
+
+    if (!targets.length) {
+        alert("登録する本にチェックを入れてください。");
+        return;
+    }
+
+    if (!confirm(`選択した${targets.length}冊を${asPurchased ? "購入済み" : "ほしい本"}として一括登録します。よろしいですか？`)) return;
+
+    const registeredKeys = [];
+    for (const info of targets) {
+        const success = asPurchased
+            ? await addRakutenBookAsPurchased(info)
+            : await addRakutenBook(info);
+        if (success) registeredKeys.push(getItemKey(info));
+    }
+
+    registeredKeys.forEach((key) => selectedKeys.delete(key));
+    dropKeysFromSearchResults(registeredKeys);
+
+    const failedCount = targets.length - registeredKeys.length;
+    alert(`${registeredKeys.length}冊を登録しました。${failedCount > 0 ? `（${failedCount}冊は登録に失敗しました）` : ""}`);
 }
 
 function renderPagination() {
